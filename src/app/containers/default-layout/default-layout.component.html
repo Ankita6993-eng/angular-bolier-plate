@@ -1,0 +1,40 @@
+<app-header
+  [navbarBrandRouterLink]="['/dashboard']"
+  [fixed]="true"
+  [navbarBrandFull]="{src: 'https://taglineinfotech.com/wp-content/uploads/2020/12/logo.png', width: 89, height: 25, alt: 'Reminder App'}"
+  [navbarBrandMinimized]="{src: 'assets/img/brand/sygnet.svg', width: 30, height: 30, alt: 'Reminder App'}"
+  [sidebarToggler]="'lg'"
+  [asideMenuToggler]="'lg'">
+
+  <ul class="nav navbar-nav ml-auto">    
+    <li class="nav-item dropdown" dropdown placement="bottom right">
+      <a class="nav-link user-icon" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false" dropdownToggle (click)="false">
+        <!-- <img src="assets/img/avatars/6.jpg" class="img-avatar" alt="admin@bootstrapmaster.com"/>        -->
+        <i class="cil-user"></i>
+      </a>
+      <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
+        <div class="dropdown-header text-center"><strong>Settings</strong></div>
+        <button type="button" class="btn btn-block btn-link dropdown-item" (click)="logout()"><i class="fa fa-lock"></i> Logout</button>
+      </div>
+    </li>
+  </ul>
+</app-header>
+<div class="app-body">
+  <app-sidebar #appSidebar [fixed]="true" [display]="'lg'" [minimized]="sidebarMinimized" (minimizedChange)="toggleMinimize($event)">
+    <app-sidebar-nav [navItems]="navItems" [perfectScrollbar] [disabled]="appSidebar.minimized"></app-sidebar-nav>
+    <app-sidebar-minimizer></app-sidebar-minimizer>
+  </app-sidebar>
+  <!-- Main content -->
+  <main class="main">
+    <cui-breadcrumb>
+    </cui-breadcrumb>
+    <div class="container-fluid">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+  
+</div>
+<app-footer>
+  <span>Angular Demo App &copy; 2021</span>
+  <span class="ml-auto">Powered by <a href="https://taglineinfotech.com/">Tagline Infotech</a></span>
+</app-footer>

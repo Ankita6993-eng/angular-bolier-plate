@@ -1,0 +1,26 @@
+// If you want to override variables do it here
+ @import "https://unpkg.com/ngx-bootstrap/datepicker/bs-datepicker.css";
+
+// Import styles
+@import "~@coreui/coreui/scss/coreui";
+
+.error-msg {
+    color: #f71d1d;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.user-icon {
+    background-color: #51585b !important;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .cil-user {
+        color: #fff;
+    }
+}

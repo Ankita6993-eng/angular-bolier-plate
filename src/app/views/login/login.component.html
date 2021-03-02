@@ -1,0 +1,48 @@
+<div class="app-body">
+  <main class="main d-flex align-items-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 mx-auto">
+          <div class="card-group">
+            <div class="card p-4">
+              <div class="card-body">
+                <form [formGroup]="loginForm" (ngSubmit)="onLoginFormSubmit()">
+                  <h1>Login</h1>
+                  <p class="text-muted">Sign In to your account</p>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="icon-user"></i></span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Email" autocomplete="email" formControlName="email" required>
+                  </div>
+                  <div class="error-msg mb-3">
+                    <span *ngIf="loginForm?.controls?.email?.touched && loginForm?.controls?.email?.errors?.required || loginForm?.controls?.email?.errors?.invalid || loginForm?.controls?.email?.errors?.pattern">Email is required or invalid.</span>
+                  </div>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="icon-lock"></i></span>
+                    </div>
+                    <input type="password" class="form-control" placeholder="Password" autocomplete="current-password" formControlName="password" required>
+                  </div>
+                  <div class="error-msg mb-3">
+                    <span *ngIf="loginForm?.controls?.password?.touched && loginForm?.controls?.password?.errors?.required || loginForm?.controls?.password?.errors?.invalid || loginForm?.controls?.password?.errors?.minlength">Password is required and must be minimum 6 characters.</span>
+                  </div>
+                  <div class="row">
+                    <div class="col-6 offset-6 text-right">
+                      <button type="submit" class="btn btn-primary px-4">Login</button>
+                    </div>
+                    <!-- <div class="col-6 text-right">
+                      <button type="button" class="btn btn-link px-0">Forgot password?</button>
+                    </div> -->
+                  </div>
+                </form>
+
+                <p>Don't you have an account? <a [routerLink]="['/register']">Sign up</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
