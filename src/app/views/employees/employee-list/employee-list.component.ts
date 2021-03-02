@@ -16,7 +16,7 @@ import { AsyncPipe } from '@angular/common';
 export class EmployeeListComponent implements OnDestroy {
   @ViewChild('employeeModal') public employeeModal: ModalDirective;
   @ViewChild('confirmationModal') public confirmationModal: ModalDirective;
-  selectedCountryId: string = null;
+  selectedEmployeeId: string = null;
   addEmployeeForm: FormGroup;
   loading: boolean = false;
   isEdit: boolean = false;
@@ -29,7 +29,7 @@ export class EmployeeListComponent implements OnDestroy {
     private toasterService: ToastrService,
     private asyncPipe: AsyncPipe
   ) {
-    this.getemployeesList();
+    this.getEmployeesList();
     this.addEmployeeForm = this.formBuilder.group({
       'name': ['', [Validators.required]],
       'alias': ['', [Validators.required]]
@@ -45,10 +45,10 @@ export class EmployeeListComponent implements OnDestroy {
     if(this.addEmployeeForm.invalid){
       return;
     }
-    this.isEdit ? this.updateCountry() :this.addCountry();
+    this.isEdit ? this.updateEmployee() :this.addEmployee();
   }
 
-  addCountry() {
+  addEmployee() {
     this.EmployeesService.addEmployee(this.addEmployeeForm.value).pipe(
       takeUntil(this.destroyed$)
     ).subscribe((result: ResponseData) => {
@@ -64,15 +64,15 @@ export class EmployeeListComponent implements OnDestroy {
     });
   }
 
-  updateCountry() {
-    this.EmployeesService.updateEmployee(this.addEmployeeForm.value, this.selectedCountryId).pipe(
+  updateEmployee() {
+    this.EmployeesService.updateEmployee(this.addEmployeeForm.value, this.selectedEmployeeId).pipe(
       takeUntil(this.destroyed$)
     ).subscribe((result: ResponseData) => {
       const { statusCode, message, data } = result;
       if (statusCode === 200) {
         let employeesClone = this.asyncPipe.transform(this.employees$);
-        const updatedCountry = employeesClone.find(country => country._id === data._id);
-        const index = employeesClone.indexOf(updatedCountry);
+        const updatedEmployee = employeesClone.find(employee => employee._id === data._id);
+        const index = employeesClone.indexOf(updatedEmployee);
         if (index > -1) {
           employeesClone[index] = data;
           this.employees$.next(employeesClone)
@@ -86,18 +86,18 @@ export class EmployeeListComponent implements OnDestroy {
     });
   }
 
-  getemployeesList() {
+  getEmployeesList() {
     const data = {
       role: 'Management'
-    };
+    }; // temporary solution for logged in user's role
     try {
       this.EmployeesService.getEmployees(data).pipe(
         takeUntil(this.destroyed$)
       ).subscribe((result: any) => {
         this.loading = false;
-        const { statusCode, data, message } = result;
-        if(statusCode === 200) {
-          this.employees$.next(data);
+        const { status, Data, message } = result;
+        if(status === 200) {
+          this.employees$.next(Data);
         } else {
           this.toasterService.error(message)
         }
@@ -109,30 +109,30 @@ export class EmployeeListComponent implements OnDestroy {
 
   openConfirmationModal(id: string) {
     this.confirmationModal.show();
-    this.selectedCountryId = id;
+    this.selectedEmployeeId = id;
   }
 
-  openUpdateCountryForm(country: any) {
+  openUpdateEmployeeForm(employee: any) {
     this.addEmployeeForm.patchValue({
-      name: country.name,
-      alias: country.alias
+      name: employee.name,
+      alias: employee.alias
     })
     this.employeeModal.show();
-    this.selectedCountryId = country._id;
+    this.selectedEmployeeId = employee._id;
     this.isEdit = true;
   }
 
-  deleteCountry() {
+  deleteEmployee() {
     try {
-      this.EmployeesService.deleteEmployee(this.selectedCountryId).pipe(
+      this.EmployeesService.deleteEmployee(this.selectedEmployeeId).pipe(
         takeUntil(this.destroyed$)
       ).subscribe((result: ResponseData) => {
         this.loading = false;
         const { statusCode, message } = result;
         if (statusCode === 200) {
           let employeesClone = this.asyncPipe.transform(this.employees$);
-          const deletedCountry = employeesClone.find(country => country._id === this.selectedCountryId);
-          const index = employeesClone.indexOf(deletedCountry);
+          const deletedEmployee = employeesClone.find(employee => employee._id === this.selectedEmployeeId);
+          const index = employeesClone.indexOf(deletedEmployee);
           if(index>-1){
             employeesClone.splice(index, 1);
             this.employees$.next(employeesClone)
@@ -150,12 +150,12 @@ export class EmployeeListComponent implements OnDestroy {
 
   closeEmployeeModal() {
     this.employeeModal.hide();
-    if (this.selectedCountryId) this.selectedCountryId = null;
+    if (this.selectedEmployeeId) this.selectedEmployeeId = null;
   }
 
   closeConfirmationModal() {
     this.confirmationModal.hide();
-    this.selectedCountryId = null;
+    this.selectedEmployeeId = null;
   }
 
 }

@@ -18,20 +18,24 @@
           <table class="table" *ngIf="(employees$ | async).length;else NoData">
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Alias</th>
-                <th>Created At</th>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Created at</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let data of (employees$ | async)">
-                <td>{{ data.name }}</td>
-                <td>{{ data.alias }}</td>
+                <td>{{ data.first_name }} {{ data.last_name }}</td>
+                <td>{{ data.gender }}</td>
+                <td>{{ data.role }}</td>
+                <td>{{ data.status }}</td>
                 <td>{{ data.createdAt | date }}</td>
                 <td>
                   <div>
-                    <button type="button" class="btn btn-link" (click)="openUpdateCountryForm(data)">
+                    <button type="button" class="btn btn-link" (click)="openUpdateEmployeeForm(data)">
                       <i class="icon-pencil icons font-xl d-block"></i>
                     </button>
                     <button type="button" class="btn btn-link" (click)="openConfirmationModal(data._id)">
@@ -110,7 +114,7 @@
                   addEmployeeForm?.controls?.alias?.errors?.invalid)
               "
             >
-              Country name is required
+              Employee name is required
             </div>
           </div>
           <div class="input-group">
@@ -138,13 +142,13 @@
                   addEmployeeForm?.controls?.alias?.errors?.invalid)
               "
             >
-              Alias name for country is required
+              Alias name for employee is required
             </div>
           </div>
           <div class="row">
             <div class="col-12">
               <button type="submit" [disabled]="addEmployeeForm.invalid" class="btn btn-primary px-4 float-right">
-                {{selectedCountryId ? 'UPDATE' : 'ADD'}}
+                {{selectedEmployeeId ? 'UPDATE' : 'ADD'}}
               </button>
             </div>
           </div>
@@ -177,7 +181,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Delete Country</h4>
+        <h4 class="modal-title">Delete Employee</h4>
         <button
           type="button"
           class="close"
@@ -189,7 +193,7 @@
       </div>
       <div class="modal-body">
         <div>
-            Are you sure to delete country?
+            Are you sure to delete employee?
         </div>
       </div>
       <div class="modal-footer">
@@ -200,7 +204,7 @@
         >
           Close
         </button>
-        <button type="button" class="btn btn-primary" (click)="deleteCountry()">Delete</button>
+        <button type="button" class="btn btn-primary" (click)="deleteEmployee()">Delete</button>
       </div>
     </div>
   </div>

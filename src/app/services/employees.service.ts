@@ -29,7 +29,7 @@ export class EmployeesService {
   }
 
   getEmployees(data, page: number = 1 , limit: number = 5) {
-    return this.http.get(`/users/searchdata?page=${page}&perPage=${limit}`, data);
+    return this.http.post(`/users/searchdata?page=${page}&perPage=${limit}`, data);
   }
   
 }
