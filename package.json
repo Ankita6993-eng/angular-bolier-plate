@@ -78,7 +78,7 @@
     "crypto": false
   },
   "engines": {
-    "node": ">= 10.13",
-    "npm": ">= 6"
+    "node": "<=14.x.x",
+    "npm": "<=6.x.x"
   }
 }
