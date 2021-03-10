@@ -19,12 +19,13 @@
                       placeholder="Enter your first_name"
                       required
                     />
+
                     <div
+                      class="validationErr"
                       *ngIf="
                         submitted &&
                         registerForm?.controls?.first_name?.errors?.required
                       "
-                      style="color: red"
                     >
                       <sup>*</sup>Please enter the name.
                     </div>
@@ -42,11 +43,11 @@
                       required
                     />
                     <div
+                      class="validationErr"
                       *ngIf="
                         submitted &&
                         registerForm?.controls?.last_name?.errors?.required
                       "
-                      style="color: red"
                     >
                       <sup>*</sup>Please enter the last name.
                     </div>
@@ -64,18 +65,26 @@
                     placeholder="Enter your email address"
                     required
                   />
-                  <div class="error-msg mb-3">
-                    <span
-                      *ngIf="
-                        (submitted &&
-                          registerForm?.controls?.email?.touched &&
-                          registerForm?.controls?.email?.errors?.required) ||
-                        registerForm?.controls?.email?.errors?.invalid ||
-                        registerForm?.controls?.email?.errors?.pattern
-                      "
-                    >
-                      <sup>*</sup> Email is required or invalid.
-                    </span>
+                  <div
+                    class="form-group col-sm-12 validationErr"
+                    *ngIf="
+                      submitted &&
+                      registerForm?.controls?.email?.errors?.required
+                    "
+                  >
+                    <sup>*</sup> Email is required.
+                  </div>
+                  <div
+                    class="form-group col-sm-12"
+                    *ngIf="
+                      (submitted &&
+                        registerForm?.controls?.email?.errors?.touched &&
+                        registerForm?.controls?.email?.errors?.required) ||
+                      registerForm?.controls?.email?.errors?.invalid ||
+                      registerForm?.controls?.email?.errors?.pattern
+                    "
+                  >
+                    <sup>*</sup> Email is invalid.
                   </div>
                 </div>
 
@@ -91,22 +100,20 @@
                       formControlName="password"
                     />
                     <div
-                      class="form-group col-sm-6"
+                      class="form-group col-sm-6 validationErr"
                       *ngIf="
                         submitted &&
                         registerForm?.controls?.password?.errors?.required
                       "
-                      style="color: red"
                     >
                       <sup>*</sup>Please enter the password.
                     </div>
                     <div
-                      class="form-group col-sm-6"
+                      class="form-group col-sm-6 validationErr"
                       *ngIf="
                         submitted &&
                         registerForm?.controls?.password?.errors?.minlength
                       "
-                      style="color: red"
                     >
                       <sup>*</sup>Password should be of more than 5 charactes.
                     </div>
@@ -129,18 +136,16 @@
                         registerForm?.controls?.confirmPassword?.errors
                           ?.mustMatch
                       "
-                      style="color: red"
                     >
                       <sup>*</sup>Password not matched
                     </div>
                     <div
-                      class="form-group col-sm-6"
+                      class="form-group col-sm-6 validationErr"
                       *ngIf="
                         submitted &&
                         registerForm?.controls?.confirmPassword?.errors
                           ?.required
                       "
-                      style="color: red"
                     >
                       <sup>*</sup>Please enter to confirm the password.
                     </div>
@@ -161,11 +166,10 @@
                     />
                   </div>
                   <div
-                    class="form-group col-sm-6"
+                    class="form-group col-sm-6 validationErr"
                     *ngIf="
                       submitted && registerForm?.controls?.dob?.errors?.required
                     "
-                    style="color: red"
                   >
                     <sup>*</sup>Please select the dob.
                   </div>
@@ -186,12 +190,11 @@
                       <option value="Project manager">Project manager</option>
                     </select>
                     <div
-                      class="form-group col-sm-6"
+                      class="form-group col-sm-6 validationErr"
                       *ngIf="
                         submitted &&
                         registerForm?.controls?.role?.errors?.required
                       "
-                      style="color: red"
                     >
                       <sup>*</sup>Please select the roles.
                     </div>
