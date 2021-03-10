@@ -7,50 +7,88 @@
             <div class="card-body p-4">
               <form [formGroup]="registerForm" (ngSubmit)="submit()">
                 <h1>Register</h1>
-                <!-- <p class="text-muted">Create your account</p> -->
-                <!-- <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="icon-user"></i></span>
-                  </div>
-                  <input type="text" class="form-control" placeholder="Firstname" autocomplete="firstname" required>
-                </div> -->
-                
+
                 <div class="row">
                   <div class="form-group col-sm-12">
-                    <label for="firstname">Firstname</label>
+                    <label for="first_name">Firstname</label>
                     <input
-                      formControlName="firstname"
-                      type="text"
-                      class="form-control is-invalid"
-                      id="firstname"
-                      placeholder="Enter your firstname"
-                    />
-                  
-                  </div>
-                  <div class="form-group col-sm-12">
-                    <label for="lastname">Lastname</label>
-                    <input
+                      formControlName="first_name"
                       type="text"
                       class="form-control"
-                      id="lastname"
-                      placeholder="Enter your lastname"
+                      id="first_name"
+                      placeholder="Enter your first_name"
+                      required
                     />
+
+                    <div
+                      class="validationErr"
+                      *ngIf="
+                        submitted &&
+                        registerForm?.controls?.first_name?.errors?.required
+                      "
+                    >
+                      <sup>*</sup>Please enter the name.
+                    </div>
+                  </div>
+
+                  <!-- Lastname -->
+                  <div class="form-group col-sm-12">
+                    <label for="last_name">Lastname</label>
+                    <input
+                      formControlName="last_name"
+                      type="text"
+                      class="form-control"
+                      id="last_name"
+                      placeholder="Enter your last_name"
+                      required
+                    />
+                    <div
+                      class="validationErr"
+                      *ngIf="
+                        submitted &&
+                        registerForm?.controls?.last_name?.errors?.required
+                      "
+                    >
+                      <sup>*</sup>Please enter the last name.
+                    </div>
                   </div>
                 </div>
 
+                <!-- Email -->
                 <div class="form-group">
                   <label for="email">Email</label>
                   <input
+                    formControlName="email"
                     type="text"
                     class="form-control"
                     id="email"
                     placeholder="Enter your email address"
+                    required
                   />
-                  <div class="error-msg mb-3">
-                    <span *ngIf="registerForm?.controls?.email?.touched && registerForm?.controls?.email?.errors?.required || registerForm?.controls?.email?.errors?.invalid || registerForm?.controls?.email?.errors?.pattern">Email is required or invalid.</span>
+                  <div
+                    class="form-group col-sm-12 validationErr"
+                    *ngIf="
+                      submitted &&
+                      registerForm?.controls?.email?.errors?.required
+                    "
+                  >
+                    <sup>*</sup> Email is required.
+                  </div>
+                  <div
+                    class="form-group col-sm-12"
+                    *ngIf="
+                      (submitted &&
+                        registerForm?.controls?.email?.errors?.touched &&
+                        registerForm?.controls?.email?.errors?.required) ||
+                      registerForm?.controls?.email?.errors?.invalid ||
+                      registerForm?.controls?.email?.errors?.pattern
+                    "
+                  >
+                    <sup>*</sup> Email is invalid.
                   </div>
                 </div>
 
+                <!-- password -->
                 <div class="row">
                   <div class="form-group col-sm-6">
                     <label for="password">Password</label>
@@ -59,8 +97,29 @@
                       class="form-control"
                       id="password"
                       placeholder="Enter your password"
+                      formControlName="password"
                     />
+                    <div
+                      class="form-group col-sm-6 validationErr"
+                      *ngIf="
+                        submitted &&
+                        registerForm?.controls?.password?.errors?.required
+                      "
+                    >
+                      <sup>*</sup>Please enter the password.
+                    </div>
+                    <div
+                      class="form-group col-sm-6 validationErr"
+                      *ngIf="
+                        submitted &&
+                        registerForm?.controls?.password?.errors?.minlength
+                      "
+                    >
+                      <sup>*</sup>Password should be of more than 5 charactes.
+                    </div>
                   </div>
+
+                  <!-- Confirm password -->
                   <div class="form-group col-sm-6">
                     <label for="confirmPassword">Confirm password</label>
                     <input
@@ -68,44 +127,113 @@
                       class="form-control"
                       id="confirmPassword"
                       placeholder="Confirm password"
+                      formControlName="confirmPassword"
+                    />
+
+                    <div
+                      *ngIf="
+                        submitted &&
+                        registerForm?.controls?.confirmPassword?.errors
+                          ?.mustMatch
+                      "
+                    >
+                      <sup>*</sup>Password not matched
+                    </div>
+                    <div
+                      class="form-group col-sm-6 validationErr"
+                      *ngIf="
+                        submitted &&
+                        registerForm?.controls?.confirmPassword?.errors
+                          ?.required
+                      "
+                    >
+                      <sup>*</sup>Please enter to confirm the password.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Date of birth -->
+                <div class="form-group">
+                  <label for="dob-input">Date of birth</label>
+                  <div>
+                    <input
+                      class="form-control"
+                      id="dob-input"
+                      type="date"
+                      name="dob-input"
+                      placeholder=""
+                      formControlName="dob"
                     />
                   </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="date-input">Date of birth</label>
-                  <div>
-                    <input class="form-control" id="date-input" type="date" name="date-input" placeholder="date">
-                    <!-- <span class="help-block">Please enter a valid date</span> -->
+                  <div
+                    class="form-group col-sm-6 validationErr"
+                    *ngIf="
+                      submitted && registerForm?.controls?.dob?.errors?.required
+                    "
+                  >
+                    <sup>*</sup>Please select the dob.
                   </div>
                 </div>
 
+                <!-- Select roles -->
                 <div class="form-group">
                   <label for="select1">Role</label>
                   <div>
-                    <select id="select1" name="select1" class="form-control">
+                    <select
+                      id="select1"
+                      name="role"
+                      class="form-control"
+                      formControlName="role"
+                    >
                       <option value="0">Please select role</option>
-                      <option value="1">Management</option>
-                      <option value="2">Project manager</option>
+                      <option value="Management">Management</option>
+                      <option value="Project manager">Project manager</option>
                     </select>
+                    <div
+                      class="form-group col-sm-6 validationErr"
+                      *ngIf="
+                        submitted &&
+                        registerForm?.controls?.role?.errors?.required
+                      "
+                    >
+                      <sup>*</sup>Please select the roles.
+                    </div>
                   </div>
                 </div>
 
+                <!-- Gender -->
                 <div class="form-group">
                   <label for="gender">Gender</label>
                   <div>
                     <div class="form-check form-check-inline mr-1" id="gender">
-                      <input class="form-check-input" type="radio" name="gender" id="male" value="Male">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="gender"
+                        id="male"
+                        value="Male"
+                        formControlName="gender"
+                        checked
+                      />
                       <label class="form-check-label" for="male">Male</label>
                     </div>
                     <div class="form-check form-check-inline mr-1">
-                      <input class="form-check-input" type="radio" name="gender" id="female" value="Female">
-                      <label class="form-check-label" for="female">Female</label>
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        name="gender"
+                        id="female"
+                        value="Female"
+                        formControlName="gender"
+                      />
+                      <label class="form-check-label" for="female"
+                        >Female</label
+                      >
                     </div>
                   </div>
                 </div>
 
-                <button type="button" class="btn btn-block btn-success">
+                <button class="btn btn-block btn-success">
                   Create Account
                 </button>
               </form>
