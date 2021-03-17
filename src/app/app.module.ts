@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -15,7 +15,7 @@ import { DefaultLayoutComponent } from './containers';
 import { P404Component } from './views/error/404.component';
 import { LoginComponent } from './views/login/login.component';
 import { RegisterComponent } from './views/register/register.component';
-
+import { ErrorHandlingService } from './services/error-handling.service';
 const APP_CONTAINERS = [
   DefaultLayoutComponent
 ];
@@ -80,6 +80,10 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor, 
       multi: true
+    },
+    {
+      provide: ErrorHandler,
+      useClass: ErrorHandlingService,
     },
     IconSetService,
     AuthService,

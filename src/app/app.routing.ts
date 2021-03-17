@@ -1,3 +1,4 @@
+
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
@@ -9,6 +10,7 @@ import { UnAuthGuard } from './guards/un-auth.guard';
 import { P404Component } from './views/error/404.component';
 import { LoginComponent } from './views/login/login.component';
 import { RegisterComponent } from './views/register/register.component';
+
 
 export const routes: Routes = [
   {
@@ -43,6 +45,11 @@ export const routes: Routes = [
         path: 'employees',
         canActivate: [AuthGuard],
         loadChildren: () => import('./views/employees/employees.module').then(m => m.CountriesModule)
+      },
+      {
+        path: 'trainees',
+        canActivate: [AuthGuard],
+        loadChildren: () => import('./views/trainees/trainees.module').then(m=>m.TraineesModule)
       }
     ]
   }, 
