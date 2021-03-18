@@ -50,7 +50,6 @@ export class TraineeListComponent implements OnInit {
     private EmployeesService: EmployeesService,
     private ngxLoaderService: NgxUiLoaderService
   ) {
- 
     this.role = this.route.snapshot.data.title;
     this.addTraineeForm = this.formBuilder.group({
       first_name: ["", [Validators.required]],
@@ -61,7 +60,6 @@ export class TraineeListComponent implements OnInit {
       gender: [""],
       // file:[null],
       // imgUpload:[""],
-      
     });
   }
 
@@ -123,45 +121,83 @@ export class TraineeListComponent implements OnInit {
      this.getTraineesList(page)     
   }
 
+  onPageChange1(pageType:string){
+    switch(pageType){
+      case 'prev':
+        
+      let paginationPages = this.paginationControl[0];
+        this.paginationControl.unshift(paginationPages-1);
+        this.paginationControl.pop();
+        //this.currentPage = page;
+
+        break;
+      case 'next':
+        this.paginationControl.push(this.paginationControl[this.paginationControl.length-1] + 1);
+        this.paginationControl.shift();
+        break;
+      default:
+        break;
+    }
+  }
+
   
   addTrainee() {
+    // this.isEdit = false;
     this.ngxLoaderService.start();
-    //Adding role explicitly
+    
+
+    // this.addTraineeForm.patchValue({
+    //   image: this.image,
+    //   role : this.role
+    // })
+     
+    //Adding form values to temporary variable
     const data1 = this.addTraineeForm.value;
+    //Adding role explicitly
     data1.role = this.role;
     //Changing date format
     data1.dob = data1.dob.split("-").join("/");
     //Adding image
     data1.image = this.image;
-    
-    
-    // //Adding image
-    // const formData = new FormData();
-    // formData.append('image', this.image);
+
+    //Object.assign(data1, {image: this.image})
+
+    //Adding image
+     const formData = new FormData();
+     Object.keys(data1).forEach((key)=>{
+       if(key!= "image"){
+         formData.append(key,data1[key]);
+       }
+     });
+     if(this.image){
+       formData.append("image",this.image);
+     }
+     //formData.append('image', this.image);
     // //const imgData = this.addTraineeForm.get('imgUpload').value;
     // //data1.image = formData;
     console.log("Data:",data1);
     try {
-      this.EmployeesService.addEmployee(data1)
+      this.EmployeesService.addEmployee(formData)
         .pipe(takeUntil(this.destroyed$))
         .subscribe((res: ResponseData) => {
           this.loading = false;
+          
           const { statusCode, data, message } = res;
           if (statusCode == 200) {
             //Adding all the values to temporary array and then pushing new value to it, to display new value added.
             let tempTrainee = this.trainees$.value;
             console.log("Temp trainee data",tempTrainee);
-            tempTrainee.unshift(data1);
+            tempTrainee.unshift(data);
             console.log("Temp trainee data",tempTrainee);
 
             //Passing value to the behaviour subject
-            this.trainees$.next(tempTrainee);          
-
+            //this.trainees$.next(tempTrainee);      
+            tempTrainee.pop();    
             console.log("VALUES",this.trainees$);
             this.ngxLoaderService.stop();
             this.toasterService.success("Successfully entered the data:")
             this.closeTraineeModal();  
-          //  this.getTraineesList();
+            //this.getTraineesList();
           } else {
             this.ngxLoaderService.stop()
             this.toasterService.error(message);
@@ -172,37 +208,53 @@ export class TraineeListComponent implements OnInit {
       this.ngxLoaderService.stop()
     }
   }
-  updateTrainee() {}
-  deleteTrainee() {
-    try {
-      this.EmployeesService.deleteEmployee(this.selectedEmployeeId).pipe(
-        takeUntil(this.destroyed$)
-      ).subscribe((result: ResponseData) => {
-        this.loading = false;
-        const { statusCode, message } = result;
-        console.log("id",this.selectedEmployeeId);
-      //   if (statusCode === 200) {
-      //     let employeesClone = this.asyncPipe.transform(this.trainees$);
-      //     const deletedEmployee = employeesClone.find(employee => employee._id === this.selectedEmployeeId);
-      //     const index = employeesClone.indexOf(deletedEmployee);
-      //     if(index>-1){
-      //       employeesClone.splice(index, 1);
-      //       this.trainees$.next(employeesClone)
-      //     }
-      //     this.closeConfirmationModal();
-      //     this.toasterService.success(message)
-      //   } else {
-
-      //   }
-       });
-    } catch (err) {
-      console.log('err', err);
-    }
+  openUpdateTraineeForm(trainee: any) {
+    this.addTraineeForm.patchValue({
+      first_name: trainee.first_name,
+      last_name: trainee.last_name,
+      email: trainee.email,
+      dob: trainee.dob,
+      gender: trainee.gender,
+      profile_pic: trainee.image,
+      password: trainee.password
+    })
+    this.traineeModal.show();
+    this.selectedTraineeId = trainee._id;
+    this.isEdit = true;
   }
+  updateTrainee() {
+    
+    // this.selectedEmployeeId = this.route.snapshot.params['_id'];
+    // this.EmployeesService.updateEmployee(this.addTraineeForm.value, this.selectedEmployeeId).pipe(
+    //   takeUntil(this.destroyed$)
+    // ).subscribe((result: ResponseData) => {
+    //   const { statusCode, message, data } = result;
+    //   console.log(this.trainees$);
+    //   if (statusCode === 200) {
+    //     let traineesClone = this.asyncPipe.transform(this.trainees$);
+    //     console.log(traineesClone);
+    //     const updatedEmployee = traineesClone.find(trainee => trainee._id === data._id);
+    //     console.log("id",updatedEmployee);
+    //     this.selectedEmployeeId = updatedEmployee
+    //     const index = traineesClone.indexOf(updatedEmployee);
+    //     if (index > -1) {
+    //       traineesClone[index] = data;
+    //       this.trainees$.next(traineesClone)
+    //     }
+    //     this.closeTraineeModal();
+    //     this.addTraineeForm.reset();
+    //     this.toasterService.success(message)
+    //   } else {
+    //     this.toasterService.error(message)
+    //   }
+    // });
+  }
+  deleteTrainee() {}
   closeConfirmationModal() {
-    this.submitted=false;
+    // this.submitted=false;
     this.addTraineeForm.reset();
     this.confirmationModal.hide();
+    this.selectedTraineeId = null;
   }
   onSubmit() {
     this.submitted = true;
@@ -210,28 +262,29 @@ export class TraineeListComponent implements OnInit {
       return false;
     }
     this.submitted=false;
-    this.addTrainee();   
-    // this.isEdit ? this.updateTrainee() : this.addTrainee();
+    //this.addTrainee();   
+     this.isEdit ? this.updateTrainee() : this.addTrainee();
   }
-
 
   closeTraineeModal() {
     this.imageUrl='';
     this.submitted=false;
     this.addTraineeForm.reset();
     this.traineeModal.hide();
+    if(this.selectedTraineeId){ this.selectedTraineeId = null}
+    this.isEdit = false;
   }
   
   uploadFile(event){
     //this.submitted=false;
-    this.addTraineeForm.reset();
+    //this.addTraineeForm.reset();
     let fReader = new FileReader();
    
     if (event.target.files && event.target.files[0]) {
       this.image = event.target.files[0]; 
       //let file = event.target.files[0];
       console.log(this.image);
-      fReader.readAsDataURL(this.image);
+       fReader.readAsDataURL(this.image);
 
       // When file uploads set it to file formcontrol
       fReader.onload = ():any => {
@@ -239,8 +292,8 @@ export class TraineeListComponent implements OnInit {
         this.addTraineeForm.patchValue({
           file: fReader.result
         });
-        //this.editFile = false;
-        //this.removeUpload = true;
+        // this.editFile = false;
+        // this.removeUpload = true;
       }
       // ChangeDetectorRef since file is loading outside the zone
       // this.cd.markForCheck();        

@@ -20,6 +20,7 @@
           <table class="table" *ngIf="(trainees$ | async).length; else NoData">
             <thead>
               <tr>
+                <th>Profile picture</th>
                 <th>Name</th>
                 <th>Gender</th>
                 <th>Role</th>
@@ -29,7 +30,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let data of trainees$ | async">              
+              <tr *ngFor="let data of trainees$ | async">   
+                <td><img [src]='data.profile_pic' *ngIf="data.profile_pic" style="height: 50px; width: 50px; position: relative; border-radius: 10px;"></td>           
                 <td>{{ data.first_name }} {{ data.last_name }}</td>
                 <td>{{ data.gender }}</td>
                 <td>{{ data.role }}</td>
@@ -37,7 +39,7 @@
                 <td>{{ data.createdAt | date }}</td>
                 <td>
                   <div>
-                    <button type="button" class="btn btn-link">
+                    <button type="button" class="btn btn-link" (click)="openUpdateTraineeForm(data)">
                       <i class="icon-pencil icons font-xl d-block"></i>
                     </button>
                     <button type="button" class="btn btn-link">
@@ -57,6 +59,12 @@
                 (click)="currentPage > 1 ? onPageChange(currentPage - 1) : null"
                 >PREV</a
               >
+              <!-- <a
+                class="page-link"
+                value="prev"
+                (click)="currentPage > 1 ? onPageChange1('prev') : null"
+                >PREV</a
+              > -->
             </li>
 
             <!-- <ng-container *ngFor="let item of paginationControl">
@@ -105,7 +113,7 @@
   class="modal fade"
   tabindex="-1"
   role="dialog"
-  aria-labelledby="employeeModalLabel"
+  aria-labelledby="traineeModalLabel"
   aria-hidden="true"
 >
   <div class="modal-dialog" role="document">
@@ -122,24 +130,24 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="img">
+        <!-- <div class="img">
           <div class="img-upload" [ngStyle]="{'background-image':'url('+ imageUrl +')'}">
             <div class="img-edit">
                 <input type="file" formControlName="imgUpload" id="fileUpload1" accept=".jpeg, .jpg" #fileInput (change)="uploadFile($event)" hidden>
             </div>
-            <button id="btnPencil" class="fas fa-pencil-alt" (click)="fileInput.click()">Select</button>
+            <button type="button" id="btnPencil" class="fas fa-pencil-alt" (click)="fileInput.click()">Select</button>
           </div>
-        </div>
+        </div> -->
         <form [formGroup]="addTraineeForm" (ngSubmit)="onSubmit()">
           <div class="input-group">
-            <!-- <div class="img">
+            <div class="img">
               <div class="img-upload" [ngStyle]="{'background-image':'url('+ imageUrl +')'}">
                 <div class="img-edit">
                     <input type="file" formControlName="imgUpload" id="fileUpload1" accept=".jpeg, .jpg" #fileInput (change)="uploadFile($event)" hidden>
                 </div>
-                <button id="btnPencil" class="fas fa-pencil-alt" (click)="fileInput.click()">Select</button>
+                <label id="btnPencil" class="fas fa-pencil-alt" (click)="fileInput.click()">Select</label>
               </div>
-            </div> -->
+            </div>
           </div>
 
           <div class="input-group">
