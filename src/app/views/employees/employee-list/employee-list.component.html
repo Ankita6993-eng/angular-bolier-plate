@@ -1,33 +1,33 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+<ngx-ui-loader fgsSize="180" [fgsType]="spinnerType"></ngx-ui-loader>
 <div class="animated fadeIn">
   <div class="row">
     <div class="col-lg-12">
       <div class="card">
-        <div
-          class="card-header d-flex align-items-center justify-content-between"
-        >
+        <div class="card-header d-flex align-items-center justify-content-between">
           <div><i class="fa fa-align-justify"></i> List of employees</div>
-          <button
-            type="button"
-            class="btn btn-outline-primary"
-            (click)="employeeModal.show()"
-          >
+          <button type="button" class="btn btn-outline-primary" (click)="employeeModal.show()">
             Add Employee
           </button>
         </div>
         <div class="card-body employees-table">
-          <table class="table" *ngIf="(employees$ | async).length;else NoData">
+          <table class="table" *ngIf="(employees$ | async).length ; else NoData">
             <thead>
               <tr>
+                <th>Profile Pic </th>
                 <th>Name</th>
                 <th>Gender</th>
                 <th>Role</th>
                 <th>Status</th>
                 <th>Created at</th>
                 <th>Actions</th>
+               
               </tr>
             </thead>
             <tbody>
+           
               <tr *ngFor="let data of (employees$ | async)">
+                <td><img [src]='data.profile_pic' class="preview" *ngIf="data.profile_pic"></td>
                 <td>{{ data.first_name }} {{ data.last_name }}</td>
                 <td>{{ data.gender }}</td>
                 <td>{{ data.role }}</td>
@@ -35,7 +35,7 @@
                 <td>{{ data.createdAt | date }}</td>
                 <td>
                   <div>
-                    <button type="button" class="btn btn-link" (click)="openUpdateEmployeeForm(data)">
+                    <button type="button" class="btn btn-link" (click)="openUpdaterecorde(data)">
                       <i class="icon-pencil icons font-xl d-block"></i>
                     </button>
                     <button type="button" class="btn btn-link" (click)="openConfirmationModal(data._id)">
@@ -49,111 +49,166 @@
           <ng-template #NoData>
             No data available
           </ng-template>
-          <!-- <ul class="pagination float-right">
-            <li class="page-item"><a class="page-link" href="#">Prev</a></li>
-            <li class="page-item active">
-              <a class="page-link" href="#">1</a>
+          <!-- Pagenation -->
+
+          <!-- New code -->
+          <ul class="pagination float-right">
+            <li class="page-item" [ngClass]="{'disabled':currentpage == 1}">
+              <a class="page-link" (click)="clickPage('prev')">Prev</a>
             </li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">4</a></li>
-            <li class="page-item"><a class="page-link" href="#">Next</a></li>
-          </ul> -->
+            <li class="page-item" *ngFor="let a of arr1" [ngClass]="{'active': currentpage === a}">
+              <a class="page-link" (click)="clickPage('current', a)">{{a}}</a>
+              </li>
+              <li class="page-item" [ngClass]="{'disabled': currentpage == tot_pages-1}">
+                <a class="page-link active" (click)="clickPage('next')" >Next</a>
+              </li>
+          </ul>
+          <!-- New code -->
+          <!-- End of Pagenation -->
+        
         </div>
       </div>
     </div>
   </div>
+  <div></div>
 </div>
 
-<div
-  bsModal
-  #employeeModal="bs-modal"
-  class="modal fade"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="employeeModalLabel"
-  aria-hidden="true"
->
+<div bsModal #employeeModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+  aria-labelledby="employeeModalLabel" aria-hidden="true" #staticModal="bs-modal">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Add employee</h4>
-        <button
-          type="button"
-          class="close"
-          (click)="closeEmployeeModal()"
-          aria-label="Close"
-        >
+        <h4 class="modal-title" id="header">{{selectedEmployeeId ? 'Update Employee': 'Add Employee ' }}</h4>
+        <button type="button" class="close" (click)="closeEmployeeModal()" aria-label="Close" (click)="addEmployeeForm.reset()">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+
       <div class="modal-body">
         <form [formGroup]="addEmployeeForm" (ngSubmit)="onSubmit()">
+        <div class="container">
+          <div class="box1">
           <div class="input-group">
             <div class="row full-width">
-              <div
-                class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1"
-              >
-                Employee
+              <div class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1">
+                First Name:
               </div>
               <div class="col-12 col-sm-9">
-                <input
-                  type="text"
-                  class="form-control full-width"
-                  formControlName="name"
-                  required
-                />
+                <input type="text" class="form-control full-width" formControlName="first_name" required inputValue=" " />
+              </div>
+            </div>
+          </div>
+          
+          <div class="row mb-3">
+            <div class="col-12 offset-sm-1 col-sm-11 error-msg"
+              *ngIf="addEmployeeForm?.controls?.first_name?.touched && (addEmployeeForm?.controls?.first_name?.errors?.required)">
+              Employee first name is required
+            </div>
+          </div>
+
+
+          <div class="input-group">
+            <div class="row full-width">
+              <div class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1">
+                Last Name
+              </div>
+              <div class="col-12 col-sm-9">
+                <input type="text" class="form-control full-width" formControlName="last_name" required />
               </div>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col-12 offset-sm-1 col-sm-11 error-msg"
-              *ngIf="
-                addEmployeeForm?.controls?.name?.touched &&
-                (addEmployeeForm?.controls?.name?.errors?.required ||
-                  addEmployeeForm?.controls?.alias?.errors?.invalid)
-              "
-            >
-              Employee name is required
+              *ngIf="addEmployeeForm?.controls?.last_name?.touched && (addEmployeeForm?.controls?.last_name?.errors?.required ||addEmployeeForm?.controls?.last_name?.errors?.invalid)">
+              Last name for employee is required
             </div>
           </div>
+
           <div class="input-group">
             <div class="row full-width">
-              <div
-                class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1"
-              >
-                Alias
+              <div class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1">
+                Email
               </div>
               <div class="col-12 col-sm-9">
-                <input
-                  type="text"
-                  class="form-control full-width"
-                  formControlName="alias"
-                  required
-                />
+                <input type="text" class="form-control full-width" formControlName="email" required />
               </div>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col-12 offset-sm-1 col-sm-11 error-msg"
-              *ngIf="
-                addEmployeeForm?.controls?.alias?.touched &&
-                (addEmployeeForm?.controls?.alias?.errors?.required ||
-                  addEmployeeForm?.controls?.alias?.errors?.invalid)
-              "
-            >
-              Alias name for employee is required
+              *ngIf="addEmployeeForm?.controls?.email?.touched && (addEmployeeForm?.controls?.email?.errors?.required )">
+              Email is required 
+            </div>
+            <div class="col-12 offset-sm-1 col-sm-11 error-msg"
+              *ngIf="addEmployeeForm?.controls?.email?.touched && (addEmployeeForm?.controls?.email?.errors?.invalid || addEmployeeForm?.controls?.email?.errors?.pattern)">
+              Email is  invalid
             </div>
           </div>
+
+          <div class="input-group">
+            <div class="row full-width">
+              <div class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1">
+                Date Of Birth:
+              </div>
+              <div class="col-12 col-sm-9">
+                <input type="date" class="form-control full-width" formControlName="dob" required />
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-12 offset-sm-1 col-sm-11 error-msg"
+              *ngIf="addEmployeeForm?.controls?.dob?.touched && (addEmployeeForm?.controls?.dob?.errors?.required ||addEmployeeForm?.controls?.dob?.errors?.invalid)">
+              Date of Birth is required
+            </div>
+          </div>
+
+          <div class="input-group">
+            <div class="row full-width">
+              <div class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1">
+                Gender:
+              </div>
+              <div class="col-9 col-sm-6">
+                <input type="radio" formControlName="gender" value="Female" required /> Female
+                <input type="radio" formControlName="gender" value="Male" required /> Male
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-12 offset-sm-1 col-sm-11 error-msg"
+              *ngIf="addEmployeeForm?.controls?.gender?.touched && (addEmployeeForm?.controls?.gender?.errors?.required)">
+              Gender is required
+            </div>
+          </div>
+
           <div class="row">
             <div class="col-12">
-              <button type="submit" [disabled]="addEmployeeForm.invalid" class="btn btn-primary px-4 float-right">
+              <button type="submit" class="btn btn-primary px-4 float-left">
                 {{selectedEmployeeId ? 'UPDATE' : 'ADD'}}
               </button>
             </div>
           </div>
-        </form>
+        </div>
+
+    <!-- Box2 Image file uploaded start -->
+          <div class="imageUpload">
+            <div class="img-edit">
+            <!-- Image Preview -->
+            <div class="imagePreview"  *ngIf="imageUrl && imageUrl !== ''">
+                <img class="pre" [src]="imageUrl"/>
+            </div>
+            <div>
+            </div>  
+          </div>
+          <input type="file" formControlName="image"  accept=".png, .jpeg, .jpg .txt .pdf" #fileInput (change)="uploadFile($event)">
+          <div  id="upload" class="btn btn-primary px-4" (click)="fileInput.click()" >Upload</div>
+          <div></div>
+        </div>
+
+       
+    <!-- Box2 Image file uploaded end -->
       </div>
+    </form>
+    </div>
       <!-- <div class="modal-footer">
         <button
           type="button"
@@ -169,39 +224,23 @@
 </div>
 
 
-<div
-  bsModal
-  #confirmationModal="bs-modal"
-  class="modal fade"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="confirmationModalLabel"
-  aria-hidden="true"
->
+<div bsModal #confirmationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+  aria-labelledby="confirmationModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">Delete Employee</h4>
-        <button
-          type="button"
-          class="close"
-          (click)="closeConfirmationModal()"
-          aria-label="Close"
-        >
+        <button type="button" class="close" (click)="closeConfirmationModal()" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
         <div>
-            Are you sure to delete employee?
+          Are you sure to delete employee?
         </div>
       </div>
       <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="closeConfirmationModal()"
-        >
+        <button type="button" class="btn btn-secondary" (click)="closeConfirmationModal()">
           Close
         </button>
         <button type="button" class="btn btn-primary" (click)="deleteEmployee()">Delete</button>
@@ -209,4 +248,3 @@
     </div>
   </div>
 </div>
-

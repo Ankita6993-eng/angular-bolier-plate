@@ -28,7 +28,7 @@ export class EmployeesService {
     return this.http.delete(`/country/${id}`);
   }
 
-  getEmployees(data, page: number = 1 , limit: number = 5) {
+  getEmployees(data, page: number  , limit: number = 5) {
     return this.http.post(`/users/searchdata?page=${page}&perPage=${limit}`, data);
   }
   

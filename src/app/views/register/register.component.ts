@@ -12,12 +12,13 @@ import { StorageService } from '../../services/storage.service';
 export class RegisterComponent {
   registerForm: FormGroup;
   emailPattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
+
   constructor(
     public formBuilder: FormBuilder,
     private auth: AuthService,
     private toaster: ToastrService,
-    private router: Router
-  ) {
+    private router: Router ) 
+    {
     this.registerForm = this.formBuilder.group({
       firstname: ['', [Validators.required]],
       lastname: ['', [Validators.required]],

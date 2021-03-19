@@ -11,6 +11,8 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { EmployeesRoutingModule } from './employees-routing.module';
 import { EmployeeListComponent } from './employee-list/employee-list.component';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { AddEmployeeComponent } from './add-employee/add-employee.component';
+import { NgxUiLoaderModule } from  'ngx-ui-loader';
 @NgModule({
   imports: [
     CommonModule,
@@ -18,10 +20,12 @@ import { ModalModule } from 'ngx-bootstrap/modal';
     ReactiveFormsModule,
     EmployeesRoutingModule,
     PaginationModule.forRoot(),
-    ModalModule
+    ModalModule,
+    NgxUiLoaderModule
   ],
   declarations: [
     EmployeeListComponent,
+    AddEmployeeComponent,
   ],
 })
 
