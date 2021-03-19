@@ -25,6 +25,7 @@
                 <th>Gender</th>
                 <th>Role</th>
                 <th>Status</th>
+                <th>DOB</th>
                 <th>Created at</th>
                 <th>Actions</th>
               </tr>
@@ -36,13 +37,14 @@
                 <td>{{ data.gender }}</td>
                 <td>{{ data.role }}</td>
                 <td>{{ data.status }}</td>
+                <td>{{ data.dob | date }}</td>
                 <td>{{ data.createdAt | date }}</td>
                 <td>
                   <div>
                     <button type="button" class="btn btn-link" (click)="openUpdateTraineeForm(data)">
                       <i class="icon-pencil icons font-xl d-block"></i>
                     </button>
-                    <button type="button" class="btn btn-link">
+                    <button type="button" class="btn btn-link" (click)="openConfirmationModal(data._id)">
                       <i class="icon-trash icons font-xl d-block"></i>
                     </button>
                   </div>
@@ -59,12 +61,6 @@
                 (click)="currentPage > 1 ? onPageChange(currentPage - 1) : null"
                 >PREV</a
               >
-              <!-- <a
-                class="page-link"
-                value="prev"
-                (click)="currentPage > 1 ? onPageChange1('prev') : null"
-                >PREV</a
-              > -->
             </li>
 
             <!-- <ng-container *ngFor="let item of paginationControl">
