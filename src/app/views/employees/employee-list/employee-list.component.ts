@@ -42,9 +42,11 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
   existing_user: any;
   tot_pages: number;
   imageUrl: any = " ";
-  imgfile: File=null;
-  role:string
-  
+  imgfile: File = null;
+  role: string;
+  role_value: Array<any> = [];
+  selected: any;
+
   constructor(
     private EmployeesService: EmployeesService,
     private formBuilder: FormBuilder,
@@ -67,14 +69,21 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
         ],
       ],
       dob: ["", Validators.required],
-     // role: ["Employee"],
+      // role: ["Employee"],
       gender: ["", Validators.required],
-      image: [""]
+      image: [""],
     });
   }
 
   ngOnInit(): void {
-    this.getEmployeesList(1);
+    const list = this.route.snapshot.data.list;
+    this.employees$.next(list.data);
+    this.tot_pages = list.totalPages;
+    for (let i = 0; i < this.tot_pages; i++) {
+      if (i < 3) {
+        this.arr1.push(i + 1);
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -86,36 +95,24 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
   uploadFile(event: any) {
     const file = event.target.files[0];
     this.imgfile = event.target.files[0];
-    console.log("event.target.file", event.target.files);
-
     this.addEmployeeForm.get("image")?.updateValueAndValidity();
     const reader = new FileReader();
     reader.onload = () => {
       this.imageUrl = reader.result as string;
     };
-    this.cd.markForCheck();
     reader.readAsDataURL(file);
   }
 
-  getEmployeesList(page: number, resetPagination: boolean = true) {
-    console.log("get employee list");
+  getEmployeesList(page: number) {
     const data = {
-      role: "Employee",
+      role: this.role,
     };
     try {
-      this.EmployeesService.getEmployees(data, page)
+      this.EmployeesService.getUser(data, page)
         .pipe(takeUntil(this.destroyed$))
         .subscribe((result: any) => {
           this.loading = false;
           const { statusCode, data, message } = result;
-          this.tot_pages = result.totalPages;
-          if (resetPagination) {
-            for (let i = 0; i < this.tot_pages; i++) {
-              if (i < 3) {
-                this.arr1.push(i + 1);
-              }
-            }
-          }
           this.ngxService.start();
           if (statusCode === 200) {
             this.employees$.next(data);
@@ -123,7 +120,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
             this.ngxService.stop();
           } else {
             this.toasterService.error(message);
-               this.ngxService.stop(); 
+            this.ngxService.stop();
           }
         });
     } catch (err) {
@@ -137,8 +134,8 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     }
     this.isEdit ? this.updateEmployee() : this.addEmployee();
   }
-  
-  employee_model(){
+
+  employee_model() {
     const emp_data = this.addEmployeeForm.value;
     const formData = new FormData();
     Object.keys(emp_data).forEach((key) => {
@@ -150,22 +147,21 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     if (this.imgfile) {
       formData.append("image", this.imgfile);
     }
-    this.imgfile=null
+    this.imgfile = null;
     return formData;
   }
 
   addEmployee() {
-   let data=this.employee_model()
+    let data = this.employee_model();
     this.ngxService.start();
     const temp_emp = this.employees$.value;
-    this.EmployeesService.addEmployee(data)
+    this.EmployeesService.addUser(data)
       .pipe(takeUntil(this.destroyed$))
       .subscribe((result: ResponseData) => {
         const { statusCode, message, data } = result;
         if (statusCode === 200) {
-          console.log("data", data);
           temp_emp.unshift(data);
-          this.toasterService.success("User successfully created")  
+          this.toasterService.success("User successfully created");
           temp_emp.pop();
           this.ngxService.stop();
           this.closeEmployeeModal();
@@ -176,82 +172,72 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
       });
   }
 
-
   openUpdaterecorde(employee: any) {
-    var date=employee.dob
-    var date1=new Date(date)
+    var date = employee.dob;
+    var date1 = new Date(date);
+
     this.addEmployeeForm.patchValue({
-      first_name:employee.first_name,
-      last_name:employee.last_name,
-      email:employee.email,
-      dob:date1.toLocaleDateString('en-CA'),
-      gender:employee.gender,
-      role:this.role,
-    })
-    this.imageUrl=employee.profile_pic
+      first_name: employee.first_name,
+      last_name: employee.last_name,
+      email: employee.email,
+      dob: date1.toLocaleDateString("en-CA"),
+      gender: employee.gender,
+      role: this.role,
+    });
+    this.imageUrl = employee.profile_pic;
     this.selectedEmployeeId = employee._id;
     this.employeeModal.show();
-    this.isEdit=true
+    this.isEdit = true;
   }
 
-  updateEmployee() {     
-  let data =  this.employee_model()
-  this.ngxService.start();
-  console.log('this.imgfile', this.imgfile);
-  
-   console.log('data', data);
-      console.log('formdata', this.addEmployeeForm.value);  
-
-       this.EmployeesService.updateEmployee(data,this.selectedEmployeeId)
-       .pipe(takeUntil(this.destroyed$)).subscribe((result:ResponseData)=>{
-        const { statusCode, message, data } = result
+  updateEmployee() {
+    let data = this.employee_model();
+    this.ngxService.start();
+    this.EmployeesService.updateUser(data, this.selectedEmployeeId)
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe((result: ResponseData) => {
+        const { statusCode, message, data } = result;
         if (statusCode === 200) {
           let employeesClone = this.asyncPipe.transform(this.employees$);
-          console.log('employeesClone', employeesClone);
           
           const updatedEmployee = employeesClone.find(
-              (employee) => employee._id === data._id
+            (employee) => employee._id === data._id
           );
           const index = employeesClone.indexOf(updatedEmployee);
 
           if (index > -1) {
-              employeesClone[index] = data;
-              this.employees$.next(employeesClone);
+            employeesClone[index] = data;
+            this.employees$.next(employeesClone);
           }
           this.closeEmployeeModal();
           this.ngxService.stop();
           this.addEmployeeForm.reset();
           this.toasterService.success(message);
-          } else {
-              this.toasterService.error(message);
-              this.ngxService.stop();
-          }
-    });
+        } else {
+          this.toasterService.error(message);
+          this.ngxService.stop();
+        }
+      });
   }
 
-
- openConfirmationModal(id: string) {
+  openConfirmationModal(id: string) {
     this.confirmationModal.show();
     this.selectedEmployeeId = id;
   }
 
   deleteEmployee() {
-    console.log('this.selectedEmployeeId', this.selectedEmployeeId);
-    
     try {
-      this.EmployeesService.deleteEmployee(this.selectedEmployeeId)
+      this.EmployeesService.deleteUser(this.selectedEmployeeId)
         .pipe(takeUntil(this.destroyed$))
         .subscribe((result: ResponseData) => {
           this.loading = false;
-          console.log('this.selectedEmployeeId', this.selectedEmployeeId);
-          const { statusCode, message } = result 
-          console.log('result', result);
-          console.log('statusCode====>', statusCode);
+          console.log("this.selectedEmployeeId", this.selectedEmployeeId);
+          const { statusCode, message } = result;
+          console.log("result", result);
+          console.log("statusCode====>", statusCode);
 
           if (statusCode === 200) {
             let employeesClone = this.asyncPipe.transform(this.employees$);
-            console.log('employeeClone', this.employees$.value);
-            
             const deletedEmployee = employeesClone.find(
               (employee) => employee._id === this.selectedEmployeeId
             );
@@ -270,16 +256,17 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     }
   }
 
-
   clickPage(pagenationType: string, page: number) {
     switch (pagenationType) {
       case "prev": {
         this.currentpage = this.currentpage - 1;
         try {
-          let first_ele = this.arr1[0];
-          this.arr1.unshift(first_ele - 1);
-          this.arr1.pop();
-          this.getEmployeesList(this.currentpage, false);
+          if (this.arr1[0] != 1) {
+            let first_ele = this.arr1[0];
+            this.arr1.unshift(first_ele - 1);
+            this.arr1.pop();
+            this.getEmployeesList(this.currentpage);
+          }
         } catch (err) {
           console.log("err", err);
         }
@@ -289,7 +276,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
         this.currentpage = page;
         const data = { role: "Employee" };
         try {
-          this.getEmployeesList(page, false);
+          this.getEmployeesList(page);
         } catch (err) {
           console.log("err", err);
         }
@@ -299,12 +286,12 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
       case "next": {
         this.currentpage = this.currentpage + 1;
         try {
-          if (this.arr1[2]!=this.tot_pages) {
+          if (this.arr1[2] != this.tot_pages) {
             let last_ele = this.arr1[2];
             this.arr1.push(last_ele + 1);
             this.arr1.shift();
-            this.getEmployeesList(this.currentpage, false);
-          } 
+            this.getEmployeesList(this.currentpage);
+          }
         } catch (err) {
           console.log("err", err);
         }
@@ -312,13 +299,14 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
       }
     }
   }
+  onChangeEvents() {}
 
   closeEmployeeModal() {
     this.employeeModal.hide();
     if (this.selectedEmployeeId) this.selectedEmployeeId = null;
     this.addEmployeeForm.reset();
-    this.isEdit=false
-    this.imageUrl=" "
+    this.isEdit = false;
+    this.imageUrl = " ";
   }
 
   closeConfirmationModal() {

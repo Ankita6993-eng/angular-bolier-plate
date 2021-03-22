@@ -19,6 +19,8 @@ export class RequestInterceptor implements HttpInterceptor {
       // const endPoint = req.url.indexOf('/api/v1') > -1 ? environment.serverUrl : environment.apiEndpoint;
       // url = endPoint + req.url;
       const accessToken = StorageService.getData('token');
+      //console.log('accessToken', accessToken);
+      
       if (accessToken) {
         headersObj.Authorization = `Bearer ${accessToken}`;
       }

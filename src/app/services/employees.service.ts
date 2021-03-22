@@ -16,19 +16,19 @@ export class EmployeesService {
     private http: HttpClient
   ) { }
 
-  addEmployee(data) {
+  addUser(data) {
     return this.http.post('/users/adduser', data);
   }
 
-  updateEmployee(data, id: string) {
+  updateUser(data, id: string) {
     return this.http.put(`/users/edituser/${id}`, data);
   }
 
-  deleteEmployee(id: string) {
+  deleteUser(id: string) {
     return this.http.delete(`/country/${id}`);
   }
 
-  getEmployees(data, page: number  , limit: number = 5) {
+  getUser(data, page: number =1 , limit: number = 5) {
     return this.http.post(`/users/searchdata?page=${page}&perPage=${limit}`, data);
   }
   
