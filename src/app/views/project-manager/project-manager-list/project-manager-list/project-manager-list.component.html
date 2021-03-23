@@ -22,94 +22,41 @@
           </button>
         </div>
         <div class="card-body trainees-table">
-          <table
-            class="table"
-            *ngIf="(projectManager$ | async).length; else NoData"
-          >
+          <table class="table" *ngIf="(projectManager$ | async).length ; else NoData">
             <thead>
               <tr>
-                <th>Profile picture</th>
+                <th>Profile Picture</th>
                 <th>Name</th>
-                <th>Gender</th>
                 <th>Role</th>
-                <th>Status</th>
+                <th>Gender</th>
                 <th>DOB</th>
-                <th>Created at</th>
+                <th>Created At</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let data of projectManager$ | async">
-                <td>
-                  <img
-                    [src]="data.profile_pic"
-                    *ngIf="data.profile_pic"
-                    style="
-                      height: 50px;
-                      width: 50px;
-                      position: relative;
-                      border-radius: 10px;
-                    "
-                  />
-                </td>
-                <td>{{ data.first_name }} {{ data.last_name }}</td>
-                <td>{{ data.gender }}</td>
-                <td>{{ data.role }}</td>
-                <td>{{ data.status }}</td>
-                <td>{{ data.dob | date }}</td>
-                <td>{{ data.createdAt | date }}</td>
+              <tr *ngFor="let item of projectManager$ | async">
+                <td><img [src]="item.profile_pic" style="width: 50px; height: 50px;"></td>
+                <td>{{item.first_name}} {{item.last_name}}</td>
+                <td>{{item.role}}</td>
+                <td>{{item.gender}}</td>
+                <td>{{item.dob | date}}</td>
+                <td>{{item.createdAt | date}}</td>
                 <td>
                   <div>
-                    <button
-                      type="button"
-                      class="btn btn-link"
-                      (click)="openUpdateTraineeForm(data)"
-                    >
-                      <i class="icon-pencil icons font-xl d-block"></i>
+                    <button type="button" class="btn-link" (click)="openUpdateProjectManagerForm(item)" style="border: none; height: 30px;">
+                    <i class="icon-pencil"></i>
                     </button>
-                    <button
-                      type="button"
-                      class="btn btn-link"
-                      (click)="openConfirmationModal(data._id)"
-                    >
-                      <i class="icon-trash icons font-xl d-block"></i>
-                    </button>
+                    <button type="button" class="btn-link" (click)="openConfirmationModal()" style="border: none;">
+                      <i class="icon-trash"></i>
+                      </button>
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
-          <ng-template #NoData> No data available </ng-template>
-          <ul class="pagination float-right">
-            <!-- <li class="page-item" [ngClass]="{ disabled: currentPage == 1 }">
-              <a class="page-link" value="prev" (click)="currentPage > 1 ? onPageChange(currentPage - 1) : null">PREV</a>
-            </li> -->
-            <!-- ----------------------------------------- -->
-            <!-- <ng-container *ngFor="let item of paginationControl">
-              <li class="page-item" *ngIf="item>=currentPage && item<currentPage + 2" [ngClass]="{'active': currentPage == item}">
-                <a class="page-link" aria-selected="true"  (click)="onPageChange(item)">{{ item }} </a>
-              </li>
-            </ng-container> -->
-
-            <!-- <li class="page-item" *ngFor="let item of paginationControl" [ngClass]="{ active: currentPage == item }">
-              <a class="page-link" aria-selected="true" (click)="item <= totalPages ? onPageChange(item) : null">{{ item }}</a>
-            </li>
-
-            <li class="page-item" [ngClass]="{ disabled: currentPage == totalPages - 1 }">
-              <a class="page-link" (click)="totalPages > currentPage ? onPageChange(currentPage + 1): null"value="next">NEXT</a>
-            </li> -->
-            <!-- ----------------------------------------- -->
-            <!-- <li class="page-item" [ngClass]="{ disabled: currentPage == 1 }">
-              <a class="page-link"  (click)="onPageChange1('prev')">PREV</a>
-            </li>
-            <li class="page-item" *ngFor="let item of paginationControl" [ngClass]="{ active: currentPage == item }">
-              <a class="page-link"  (click)="item <= totPages ? onPageChange1('current',item): null">{{item}}</a>
-            </li>
-            <li class="page-item" [ngClass]="{ disabled: currentPage == totPages - 1 }">
-              <a class="page-link"  (click)="onPageChange1('next')">NEXT</a>
-            </li> -->
-          </ul>
         </div>
+        <ng-template #NoData></ng-template>
       </div>
     </div>
   </div>
@@ -130,8 +77,8 @@
         <button
           type="button"
           class="close"
-          (click)="closeProjectManagerModal()"
           aria-label="Close"
+          (click)="closeProjectManagerModal()"
         >
           <span aria-hidden="true">&times;</span>
         </button>
@@ -334,7 +281,7 @@
           <div class="row">
             <div class="col-12">
               <button type="submit" class="btn btn-primary px-4 float-right">
-                {{ selectedProjectManagerId ? "UPDATE" : "ADD" }}
+                {{ selectedProjectManagerData ? "UPDATE" : "ADD" }}
               </button>
             </div>
           </div>
@@ -369,31 +316,18 @@
         <h4 class="modal-title">Delete Trainee</h4>
         <button
           type="button"
-          class="close"
           (click)="closeConfirmationModal()"
-          aria-label="Close"
         >
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+      <h4>Are you sure you want to delete.</h4>
       <div class="modal-body">
-        <div>Are you sure to delete Trainee?</div>
+       
       </div>
       <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="closeConfirmationModal()"
-        >
-          Close
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="deleteProjectManager()"
-        >
-          Delete
-        </button>
+        <button type="button" class="close" (click)="closeConfirmationModal()">close</button>
+        <button type="button" class="close" (click)="deleteProjectManager()">Delete</button>   
       </div>
     </div>
   </div>
