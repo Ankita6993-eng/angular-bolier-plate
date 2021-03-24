@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { ModalDirective } from "ngx-bootstrap/modal";
 import { BehaviorSubject, ReplaySubject } from "rxjs";
-import { debounce, take, takeUntil } from "rxjs/operators";
+import { debounce, last, take, takeUntil } from "rxjs/operators";
 import { EmployeesService, ResponseData } from "../../../../services/employees.service";
 import { ToastrService } from "ngx-toastr";
 import { AsyncPipe, formatDate } from "@angular/common";
@@ -28,6 +28,9 @@ export class ProjectManagerListComponent implements OnInit {
   image:File;
   imagesUrl:any="";
   isEdit;
+  paginationControl=[];
+  totalPages;
+  currentPage;
   emailPattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
   constructor(
     private employeeService: EmployeesService,
@@ -51,22 +54,31 @@ export class ProjectManagerListComponent implements OnInit {
   ngOnInit(): void {
     const list = this.route.snapshot.data.list;
     this.projectManager$.next(list.data);
+    this.currentPage = list.currentPage;
+    console.log("Current Page",this.currentPage);
+    this.totalPages = list.totalPages;
+    console.log("Total Page",this.totalPages);
+    for(let i=0;i<=this.totalPages;i++){
+      if(i < 3){
+        this.paginationControl.push(i + 1);
+      }
+    }
   }
 
-  getProjectManagerList() {
+  getProjectManagerList(page?:any) {
     this.ngxLoader.start();
     const data = {
       role: this.role,
     };
     try {
       this.employeeService
-        .getEmployees(data)
+        .getEmployees(data,page)
         .pipe(takeUntil(this.destroyed$))
         .subscribe((res: any) => {
           const { statusCode, data, message } = res;
           if (statusCode == 200) {
             this.projectManager$.next(data);
-            this.toaster.success(message);
+            //this.toaster.success(message);
             this.ngxLoader.stop();
           } else {
             this.toaster.error(message);
@@ -76,18 +88,6 @@ export class ProjectManagerListComponent implements OnInit {
     } catch (error) {
       console.log(error);
       this.ngxLoader.stop();
-    }
-  }
-  formData(){
-    const formdata = new FormData;
-    const projectManagerData = this.addProjectManagerForm.value;
-    projectManagerData.role = this.role;
-    projectManagerData.dob = projectManagerData.dob.split("-").join("/");
-    Object.keys(projectManagerData).forEach((key) =>{
-      if(key != "image"){formdata.append(key,projectManagerData[key])}
-    });
-    if(this.image){
-      formdata.append("image",this.image);
     }
   }
   addProjectManager(){
@@ -135,49 +135,51 @@ export class ProjectManagerListComponent implements OnInit {
       password:data.password,
       profile_pic:data.profile_pic,
       gender:data.gender
-    })
+    });
     this.imagesUrl = data.profile_pic;
     this.isEdit = true;
     this.selectedProjectManagerData = data._id;
   }
 
   updateProjectManager(){
-    //this.ngxLoader.start();
+    this.ngxLoader.start();
     const formdata = new FormData;
     const projectManagerData = this.addProjectManagerForm.value;
     projectManagerData.role = this.role;
-    projectManagerData.dob = projectManagerData.dob.split("-").join("/");
+    projectManagerData.dob = projectManagerData.dob;
     Object.keys(projectManagerData).forEach((key) =>{
       if(key != "image"){formdata.append(key,projectManagerData[key])}
     });
     if(this.image){
       formdata.append("image",this.image);
     }  
+    console.log("Project manager data:",projectManagerData);
     try{
       this.employeeService.updateEmployee(formdata,this.selectedProjectManagerData).pipe(takeUntil(this.destroyed$)).subscribe((res:ResponseData)=>{
         const {statusCode,data} = res;
-        if(statusCode == 200){         
+        if(statusCode == 200){                 
           let projManagerDataValue = this.asyncPipe.transform(this.projectManager$);
-          //console.log(projectManagerData);
-          let updatedProjManager = projManagerDataValue.find(item=>item._id == data._id);
+          console.log(projManagerDataValue);
+          let updatedProjManager = projManagerDataValue.find((item)=>item._id === data._id);
           console.log("updated proj value:",updatedProjManager);
-          let index = updatedProjManager.indexOf(projManagerDataValue);
-          console.log("index:",index);
+          let index = projManagerDataValue.indexOf(updatedProjManager);
+          console.log("index:",index);     
           if(index > -1){
             projManagerDataValue[index]=data;
             this.projectManager$.next(projManagerDataValue);
             this.toaster.success("Updated Successfully");
             this.closeProjectManagerModal();
-           // this.ngxLoader.stop();
+            this.ngxLoader.stop();
           }
           else{
             this.toaster.error("Cannot update record");
-          //  this.ngxLoader.stop();
+            this.ngxLoader.stop();
           }
         }
-      })
+      });
     }catch{
-
+      this.toaster.error();
+      this.ngxLoader.stop();
     }
   }
   uploadFile(event){
@@ -194,7 +196,95 @@ export class ProjectManagerListComponent implements OnInit {
     }
     }
   }
+  onPageChange(page){
+    console.log("",page);
+    // this.currentPage = page;
+    // this.getProjectManagerList(this.currentPage);
+    if(this.currentPage != page){
+      if(this.paginationControl[this.paginationControl.length - 1] != this.totalPages ){
+        this.paginationControl.push([this.paginationControl[this.paginationControl.length-1] + 1]);
+        this.paginationControl.shift();
+      }
+    }
+     //else{
+  //     if(this.paginationControl[0] != 1 ){
+  //     this.paginationControl.unshift([this.paginationControl[0] - 1]);
+  //      this.paginationControl.pop();
+  //     }
+  // }
+    
 
+
+
+    // if(this.paginationControl[this.paginationControl.length - 1] != this.totalPages ){
+    //   if(this.currentPage != page){ 
+    //   this.paginationControl.push([this.paginationControl[this.paginationControl.length-1] + 1]);
+    //   this.paginationControl.shift();
+    //   }
+    //  }   
+    //  else{
+    //     if(this.paginationControl[0] != 1 ){
+    //       if(this.currentPage != page){
+    //       this.paginationControl.unshift([this.paginationControl[0] - 1]);
+    //       this.paginationControl.pop();
+    //       }
+    //     }
+    //  }
+     this.currentPage = page;
+     this.getProjectManagerList(this.currentPage);
+
+
+
+     //else{
+    //   this.paginationControl.unshift([this.paginationControl[0] - 1]);
+    //   this.paginationControl.pop();
+    //   this.currentPage = page;
+    //   this.getProjectManagerList(this.currentPage);
+    // }
+    // if(page > this.currentPage){
+    //   this.paginationControl.push(this.paginationControl[this.paginationControl.length - 1] + 1);
+    //   this.paginationControl.shift();
+    // }else{
+    //   this.paginationControl.unshift([this.paginationControl[0] - 1]);
+    //   this.paginationControl.pop();
+    // }
+    //page = this.currentPage;
+    //for(let i=1;i<=this.totalPages;i++){
+      // if(this.currentPage < this.totalPages){
+      //   this.getProjectManagerList(page);
+      //   this.currentPage+=1;
+      // }
+    //}
+    //this.getProjectManagerList(page);
+  }
+  onNext(){
+    //for(let i=1;i<this.totalPages;i++){
+      //if(this.currentPage < this.totalPages){
+        //if(page > this.currentPage){         
+          if(this.paginationControl[this.paginationControl.length-1] != this.totalPages){
+            this.paginationControl.push([this.paginationControl[this.paginationControl.length-1] + 1]);
+            this.paginationControl.shift();
+          }     
+          this.currentPage +=1;
+          this.getProjectManagerList(this.currentPage);   
+          console.log(this.currentPage);
+      //  }
+      //}
+    //}
+  }
+  onPrev(page){
+    //if(this.currentPage > 1){     
+      if(this.paginationControl[0] != 1){
+        //if(this.currentPage != page){
+        this.paginationControl.unshift([this.paginationControl[0] - 1]);
+        this.paginationControl.pop();
+      //}
+      }
+      this.currentPage-=1;
+      this.getProjectManagerList(this.currentPage);
+    //}
+  }
+  
   onSubmit(){
     this.submitted = true;
     if(this.addProjectManagerForm.invalid){
@@ -203,8 +293,7 @@ export class ProjectManagerListComponent implements OnInit {
     this.isEdit ? this.updateProjectManager() : this.addProjectManager();
     this.closeProjectManagerModal();
   }
-  
-  
+   
   openConfirmationModal(){
     this.confirmationModal.show();
   }
