@@ -26,8 +26,6 @@ input[type=radio] {
     background-position: center;
 }
 #btnPencil{
-    border: none; 
-    background: none; 
     margin: 85px; 
     rotate: 45;
 }
@@ -42,4 +40,8 @@ input[type=radio] {
 .img-preview{
     height: 30px;
     width: 30px;
+}
+.class1{
+    box-shadow: 3px 3px 3px;
+    text-shadow: 1px 1px 2px red;
 }

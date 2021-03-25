@@ -30,7 +30,7 @@
                 <th>Role</th>
                 <th>Gender</th>
                 <th>DOB</th>
-                <th>Created At</th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -41,10 +41,10 @@
                 <td>{{item.role}}</td>
                 <td>{{item.gender}}</td>
                 <td>{{item.dob | date}}</td>
-                <td>{{item.createdAt | date}}</td>
+                <td>{{item.status }}</td>
                 <td>
                   <div>
-                    <button type="button" class="btn-link" (click)="openUpdateProjectManagerForm(item)" style="border: none; height: 30px;">
+                    <button type="button" class="btn-link" id="edit" (click)="openUpdateProjectManagerForm(item)" style="border: none; height: 30px;">
                     <i class="icon-pencil"></i>
                     </button>
                     <button type="button" class="btn-link" (click)="openConfirmationModal()" style="border: none;">
@@ -70,10 +70,30 @@
             </li>
           </ul>
         </div>
+
+        <!-- <div>
+          <ul class="pagination float-right" style="margin-right: 20px;">
+            <li class="page-item" [ngClass]="{disabled:currentPage == 1}">
+              <a class="page-link" (click)="onPageChange1('prev')">Prev</a>
+            </li>
+            <li class="page-item" *ngFor="let item of paginationControl" [ngClass]="{active:currentPage == item}">
+              <a class="page-link"  (click)="onPageChange1('pages',item)">{{item}}</a>
+            </li>          
+            <li class="page-item" [ngClass]="{disabled:currentPage == totalPages}">
+              <a class="page-link active" (click)="onPageChange1('next')">Next</a>
+            </li>
+          </ul>
+        </div>  -->
+
       </div>
     </div>
   </div>
 </div>
+<script>
+  $("#btnPencil").mouseup(function(e){
+    $("#btnPencil").css("font","red");
+  });
+</script>
 <div
   bsModal
   #projectManagerModal="bs-modal"
@@ -86,7 +106,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content" style="width: 700px">
       <div class="modal-header">
-        <h4 class="modal-title">Add Project Manager</h4>
+        <h4 class="modal-title" >{{ selectedProjectManagerData ? "Edit Project Manager" : "Add Project Manager" }}</h4>
         <button
           type="button"
           class="close"
@@ -104,7 +124,7 @@
                 <div class="img-edit">
                     <input type="file" formControlName="imgUpload" id="fileUpload1" accept=".jpeg, .jpg" #fileInput (change)="uploadFile($event)" hidden>
                 </div>
-                <label id="btnPencil" class="fas fa-pencil-alt" (click)="fileInput.click()">Select</label>
+                <label id="btnPencil" class="fas fa-pencil-alt" (click)="fileInput.click()">Click</label>
               </div>
             </div>
           </div>
@@ -291,7 +311,37 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="input-group" [style.visibility]="(selectedProjectManagerData ? 'visible' : 'hidden')">
+            <!-- <div class="input-group"  > -->
+              <div class="row full-width">
+                <div
+                  class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1"
+                >
+                  Status:
+                </div>
+                <div class="col-12 col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control full-width"
+                    formControlName="status"           
+                  />
+                </div>
+                <div class="row mb-3">
+                  <div
+                    class="col-12 offset-sm-1 col-sm-11 error-msg"
+                    *ngIf="
+                      submitted &&
+                      (addProjectManagerForm?.controls?.status?.errors
+                        ?.required)
+                    "
+                  >
+                    Enter the status.
+                  </div>
+                </div>
+              </div>
+            <!-- </div> -->
+          </div>
+          <div class="row" style="margin-top: 5px;">
             <div class="col-12">
               <button type="submit" class="btn btn-primary px-4 float-right">
                 {{ selectedProjectManagerData ? "UPDATE" : "ADD" }}
