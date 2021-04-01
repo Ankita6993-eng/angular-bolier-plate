@@ -109,7 +109,7 @@
             <div class="img">
               <div class="img-upload" [ngStyle]="{'background-image':'url('+ imagesUrl +')'}">
                 <div class="img-edit">
-                    <input type="file" formControlName="imgUpload" id="fileUpload1" accept=".jpeg, .jpg" #fileInput (change)="uploadFile($event)" hidden>
+                    <input type="file" id="fileUpload1" accept=".jpeg, .jpg" #fileInput (change)="uploadFile($event)" hidden>
                 </div>
                 <label id="btnPencil" class="fas fa-pencil-alt" (click)="fileInput.click()">Click</label>
               </div>
