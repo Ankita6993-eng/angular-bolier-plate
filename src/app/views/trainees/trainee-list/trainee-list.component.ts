@@ -110,7 +110,7 @@ export class TraineeListComponent implements OnInit {
     this.currentPage = page;
     this.getTraineesList(this.currentPage);
   }
-  onNext(page) {
+  onNext() {
     if (this.paginationControl[this.paginationControl.length - 1] != this.totalPages) {
       this.paginationControl.push(this.paginationControl[this.paginationControl.length - 1] + 1);
       this.paginationControl.shift();
