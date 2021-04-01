@@ -48,6 +48,7 @@
     "ngx-bootstrap": "^6.2.0",
     "ngx-perfect-scrollbar": "^10.1.0",
     "ngx-toastr": "^13.2.0",
+    "ngx-ui-loader": "^10.0.0",
     "path": "^0.12.7",
     "rxjs": "^6.6.3",
     "simple-line-icons": "^2.5.5",
