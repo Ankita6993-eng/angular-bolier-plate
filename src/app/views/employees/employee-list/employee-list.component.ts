@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { takeUntil } from 'rxjs/operators'
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
 import { EmployeesService, ResponseData } from '../../../services/employees.service';
@@ -6,6 +6,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { AsyncPipe } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   templateUrl: 'employee-list.component.html',
@@ -13,7 +14,7 @@ import { AsyncPipe } from '@angular/common';
   providers: [AsyncPipe]
 })
 
-export class EmployeeListComponent implements OnDestroy {
+export class EmployeeListComponent implements OnInit, OnDestroy {
   @ViewChild('employeeModal') public employeeModal: ModalDirective;
   @ViewChild('confirmationModal') public confirmationModal: ModalDirective;
   selectedEmployeeId: string = null;
@@ -22,18 +23,28 @@ export class EmployeeListComponent implements OnDestroy {
   isEdit: boolean = false;
   destroyed$: ReplaySubject<boolean> = new ReplaySubject(1);
   employees$ = new BehaviorSubject<any[]>([]);
-
+  role:string = null;
   constructor(
     private EmployeesService: EmployeesService,
     private formBuilder: FormBuilder,
     private toasterService: ToastrService,
-    private asyncPipe: AsyncPipe
+    private asyncPipe: AsyncPipe,
+    private route: ActivatedRoute
   ) {
-    this.getEmployeesList();
+    //this.getEmployeesList();      
+    // console.log("router data",this.role);
+    // this.role = this.route.snapshot.data.title;
     this.addEmployeeForm = this.formBuilder.group({
       'name': ['', [Validators.required]],
       'alias': ['', [Validators.required]]
-    });
+    });    
+  }
+  ngOnInit(): void {
+    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
+    //Add 'implements OnInit' to the class.
+    const list = this.route.snapshot.data.list;   
+    this.employees$.next(list.data);
+    console.log("List values:",list);
   }
 
   ngOnDestroy(): void {
@@ -88,16 +99,18 @@ export class EmployeeListComponent implements OnDestroy {
 
   getEmployeesList() {
     const data = {
-      role: 'Management'
+      role: this.role
     }; // temporary solution for logged in user's role
     try {
       this.EmployeesService.getEmployees(data).pipe(
         takeUntil(this.destroyed$)
       ).subscribe((result: any) => {
         this.loading = false;
-        const { status, Data, message } = result;
-        if(status === 200) {
-          this.employees$.next(Data);
+        const { statusCode, data, message } = result;
+        if(statusCode === 200) {
+          
+          this.employees$.next(data);
+          console.log(this.employees$.value);
         } else {
           this.toasterService.error(message)
         }

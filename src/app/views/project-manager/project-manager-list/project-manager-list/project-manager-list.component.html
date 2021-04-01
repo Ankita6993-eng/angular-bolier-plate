@@ -1,0 +1,371 @@
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+/>
+<ngx-ui-loader fgsSize="180" [fgsType]="spinnerType"></ngx-ui-loader>
+<div class="animated fadeIn">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div
+          class="card-header d-flex align-items-center justify-content-between"
+        >
+          <div>
+            <i class="fa fa-align-justify"></i> List of Project managers
+          </div>
+          <button
+            type="button"
+            class="btn btn-outline-primary"
+            (click)="projectManagerModal.show()"
+          >
+            Add Project Manager
+          </button>
+        </div>
+        <div class="card-body trainees-table">
+          <table class="table" *ngIf="(projectData).length ; else NoData">
+            <thead>
+              <tr>
+                <th>Profile Picture</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Gender</th>
+                <th>DOB</th>
+                <th>Status</th>
+                <th>Email</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of projectData">
+                <td><img [src]="item.profile_pic" style="width: 50px; height: 50px; border-radius: 10px;"></td>
+                <td>{{item.first_name}} {{item.last_name}}</td>
+                <td>{{item.role}}</td>
+                <td>{{item.gender}}</td>
+                <td>{{item.dob | date}}</td>
+                <td>{{item.status }}</td>
+                <td>{{item.email }}</td>
+                <td>
+                  <div>
+                    <button type="button" class="btn-link" id="edit" (click)="openUpdateProjectManagerForm(item)" style="border: none; height: 30px;">
+                    <i class="icon-pencil"></i>
+                    </button>
+                    <button type="button" class="btn-link" (click)="openConfirmationModal()" style="border: none;">
+                      <i class="icon-trash"></i>
+                      </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #NoData></ng-template>
+        <div>
+          <ul class="pagination float-right" style="margin-right: 20px;">           
+            <li class="page-item" [ngClass]="{disabled:currentPage == 1}">
+              <a class="page-link" (click)="onPrev()">Prev</a>
+            </li>
+            <li class="page-item" *ngFor="let item of paginationControl" [ngClass]="{active:currentPage == item}">
+              <a class="page-link"  (click)="onPageChange(item)">{{item}}</a>
+            </li>          
+            <li class="page-item" [ngClass]="{disabled:currentPage == totalPages}">
+              <a class="page-link" (click)="onNext()">Next</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $("#btnPencil").mouseup(function(e){
+    $("#btnPencil").css("font","red");
+  });
+</script>
+<div
+  bsModal
+  #projectManagerModal="bs-modal"
+  class="modal fade"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="traineeModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="width: 700px">
+      <div class="modal-header">
+        <h4 class="modal-title" >{{ selectedProjectManagerData ? "Edit Project Manager" : "Add Project Manager" }}</h4>
+        <button
+          type="button"
+          class="close"
+          aria-label="Close"
+          (click)="closeProjectManagerModal()"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addProjectManagerForm" (ngSubmit)="onSubmit()">
+          <div class="input-group">
+            <div class="img">
+              <div class="img-upload" [ngStyle]="{'background-image':'url('+ imagesUrl +')'}">
+                <div class="img-edit">
+                    <input type="file" formControlName="imgUpload" id="fileUpload1" accept=".jpeg, .jpg" #fileInput (change)="uploadFile($event)" hidden>
+                </div>
+                <label id="btnPencil" class="fas fa-pencil-alt" (click)="fileInput.click()">Click</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <div class="row full-width">
+              <div
+                class="input-group-label align-items-center col-10 col-sm-2 offset-sm-1"
+              >
+                <label class="full-width"> First Name: </label>
+              </div>
+              <div class="col-12 col-sm-9">
+                <input
+                  type="text"
+                  class="form-control full-width"
+                  formControlName="first_name"
+                  required
+                />
+                <div class="row mb-3">
+                  <div
+                    class="col-12 offset-sm-1 col-sm-11 error-msg"
+                    *ngIf="
+                      submitted &&
+                      addProjectManagerForm?.controls?.first_name?.errors
+                        ?.required
+                    "
+                  >
+                    First name is required
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <div class="row full-width">
+              <div
+                class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1"
+              >
+                Last Name:
+              </div>
+              <div class="col-12 col-sm-9">
+                <input
+                  type="text"
+                  class="form-control full-width"
+                  formControlName="last_name"
+                  required
+                />
+                <div class="row mb-3">
+                  <div
+                    class="col-12 offset-sm-1 col-sm-11 error-msg"
+                    *ngIf="
+                      submitted &&
+                      addProjectManagerForm?.controls?.last_name?.errors
+                        ?.required
+                    "
+                  >
+                    Last name is required
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <div class="row full-width">
+              <div
+                class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1"
+              >
+                Email:
+              </div>
+              <div class="col-12 col-sm-9">
+                <input
+                  type="email"
+                  class="form-control full-width"
+                  formControlName="email"
+                  required
+                />
+                <div class="row mb-3">
+                  <div
+                    class="col-12 offset-sm-1 col-sm-11 error-msg"
+                    *ngIf="
+                      submitted &&
+                      (addProjectManagerForm?.controls?.email?.errors
+                        ?.required ||
+                        addProjectManagerForm?.controls?.email?.errors?.pattern)
+                    "
+                  >
+                    Email required:
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <div class="row full-width">
+              <div
+                class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1"
+              >
+                Date:
+              </div>
+              <div class="col-12 col-sm-9">
+                <input
+                  type="date"
+                  class="form-control full-width"
+                  formControlName="dob"
+                  required
+                />
+                <div class="row mb-3">
+                  <div
+                    class="col-12 offset-sm-1 col-sm-11 error-msg"
+                    *ngIf="
+                      submitted &&
+                      addProjectManagerForm?.controls?.dob?.errors?.required
+                    "
+                  >
+                    Select the date.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <div class="row full-width">
+              <div
+                class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1"
+              >
+                Password:
+              </div>
+              <div class="col-12 col-sm-9">
+                <input
+                  type="password"
+                  class="form-control full-width"
+                  formControlName="password"
+                  required
+                />
+                <div class="row mb-3">
+                  <div
+                    class="col-12 offset-sm-1 col-sm-11 error-msg"
+                    *ngIf="
+                      submitted &&
+                      (addProjectManagerForm?.controls?.password?.errors
+                        ?.required ||
+                        addProjectManagerForm?.controls?.password?.errors
+                          ?.minlength)
+                    "
+                  >
+                    Enter the password.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <div class="row full-width">
+              <div
+                class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1"
+              >
+                <label>Gender:</label>
+              </div>
+              <div class="col-12 col-sm-9">
+                <input
+                  id="male"
+                  class="gen"
+                  type="radio"
+                  value="Male"
+                  name="gender"
+                  formControlName="gender"
+                />
+                <label>Male</label>&nbsp;
+                <input
+                  id="female"
+                  class="gen"
+                  type="radio"
+                  value="Female"
+                  name="gender"
+                  formControlName="gender"
+                />
+                <label>Female</label>
+              </div>
+            </div>
+          </div>
+          <div class="input-group" [style.visibility]="(selectedProjectManagerData ? 'visible' : 'hidden')">
+              <div class="row full-width">
+                <div
+                  class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1"
+                >
+                  Status:
+                </div>
+                <div class="col-12 col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control full-width"
+                    formControlName="status"           
+                  />
+                </div>
+                <div class="row mb-3">
+                  <div
+                    class="col-12 offset-sm-1 col-sm-11 error-msg"
+                    *ngIf="
+                      submitted &&
+                      (addProjectManagerForm?.controls?.status?.errors
+                        ?.required)
+                    "
+                  >
+                    Enter the status.
+                  </div>
+                </div>
+              </div>
+          </div>
+          <div class="row" style="margin-top: 5px;">
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary px-4 float-right">
+                {{ selectedProjectManagerData ? "UPDATE" : "ADD" }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  bsModal
+  #confirmationModal="bs-modal"
+  class="modal fade"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="confirmationModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Delete Trainee</h4>
+        <button
+          type="button"
+          (click)="closeConfirmationModal()"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <h4>Are you sure you want to delete.</h4>
+      <div class="modal-body">
+       
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="close" (click)="closeConfirmationModal()">close</button>
+        <button type="button" class="close" (click)="deleteProjectManager()">Delete</button>   
+      </div>
+    </div>
+  </div>
+</div>

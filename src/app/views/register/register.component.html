@@ -75,7 +75,7 @@
                     <sup>*</sup> Email is required.
                   </div>
                   <div
-                    class="form-group col-sm-12"
+                    class="form-group col-sm-12 validationErr"
                     *ngIf="
                       (submitted &&
                         registerForm?.controls?.email?.errors?.touched &&
@@ -100,7 +100,7 @@
                       formControlName="password"
                     />
                     <div
-                      class="form-group col-sm-6 validationErr"
+                      class="form-group  validationErr"
                       *ngIf="
                         submitted &&
                         registerForm?.controls?.password?.errors?.required
@@ -109,18 +109,18 @@
                       <sup>*</sup>Please enter the password.
                     </div>
                     <div
-                      class="form-group col-sm-6 validationErr"
+                      class="form-group validationErr"
                       *ngIf="
                         submitted &&
                         registerForm?.controls?.password?.errors?.minlength
                       "
                     >
-                      <sup>*</sup>Password should be of more than 5 charactes.
+                      <sup>*</sup>Password should be of more than 5 characters.
                     </div>
                   </div>
 
                   <!-- Confirm password -->
-                  <div class="form-group col-sm-6">
+                  <div class="form-group col-sm-6"> 
                     <label for="confirmPassword">Confirm password</label>
                     <input
                       type="password"
@@ -130,17 +130,17 @@
                       formControlName="confirmPassword"
                     />
 
-                    <div
-                      *ngIf="
-                        submitted &&
-                        registerForm?.controls?.confirmPassword?.errors
-                          ?.mustMatch
+                    <div class="form-group  validationErr"
+                      *ngIf=" (
+                    registerForm?.controls?.confirmPassword?.errors?.mustMatch)
                       "
                     >
+                    <div *ngIf="submitted && registerForm?.controls?.confirmPassword?.errors?.mustMatch">
                       <sup>*</sup>Password not matched
                     </div>
+                    </div>
                     <div
-                      class="form-group col-sm-6 validationErr"
+                      class="form-group  validationErr"
                       *ngIf="
                         submitted &&
                         registerForm?.controls?.confirmPassword?.errors
