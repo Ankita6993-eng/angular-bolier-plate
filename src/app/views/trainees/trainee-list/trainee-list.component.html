@@ -54,48 +54,14 @@
           </table>
           <ng-template #NoData> No data available </ng-template>
           <ul class="pagination float-right">
-            <li class="page-item" [ngClass]="{ disabled: currentPage == 1 }">
-              <a
-                class="page-link"
-                value="prev"
-                (click)="currentPage > 1 ? onPageChange(currentPage - 1) : null"
-                >PREV</a
-              >
+            <li class="page-item" [ngClass]="{disabled:currentPage == 1}">
+              <a class="page-link" (click)="onPrev()">Prev</a>
             </li>
-
-            <!-- <ng-container *ngFor="let item of paginationControl">
-              <li class="page-item" *ngIf="item>=currentPage && item<currentPage + 2" [ngClass]="{'active': currentPage == item}">
-                <a class="page-link" aria-selected="true"  (click)="onPageChange(item)">{{ item }} </a>
-              </li>
-            </ng-container> -->
-
-            <li
-              class="page-item"
-              *ngFor="let item of paginationControl"
-              [ngClass]="{ active: currentPage == item }"
-            >
-              <a
-                class="page-link"
-                aria-selected="true"
-                (click)="item <= totalPages ? onPageChange(item) : null"
-                >{{ item }}
-              </a>
-            </li>
-
-            <li
-              class="page-item"
-              [ngClass]="{ disabled: currentPage == totalPages - 1 }"
-            >
-              <a
-                class="page-link"
-                (click)="
-                  totalPages > currentPage
-                    ? onPageChange(currentPage + 1)
-                    : null
-                "
-                value="next"
-                >NEXT</a
-              >
+            <li class="page-item" *ngFor="let item of paginationControl" [ngClass]="{active:currentPage == item}">
+              <a class="page-link"  (click)="onPageChange(item)">{{item}}</a>
+            </li>          
+            <li class="page-item" [ngClass]="{disabled:currentPage == totalPages}">
+              <a class="page-link" (click)="onNext()">Next</a>
             </li>
           </ul>
         </div>
@@ -115,7 +81,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content" style="width: 700px;">
       <div class="modal-header">
-        <h4 class="modal-title">Add Trainee</h4>
+        <h4 class="modal-title">{{ selectedTraineeId ? "Edit Trainee" : "Add Trainee" }}</h4>
         <button
           type="button"
           class="close"
@@ -126,14 +92,6 @@
         </button>
       </div>
       <div class="modal-body">
-        <!-- <div class="img">
-          <div class="img-upload" [ngStyle]="{'background-image':'url('+ imageUrl +')'}">
-            <div class="img-edit">
-                <input type="file" formControlName="imgUpload" id="fileUpload1" accept=".jpeg, .jpg" #fileInput (change)="uploadFile($event)" hidden>
-            </div>
-            <button type="button" id="btnPencil" class="fas fa-pencil-alt" (click)="fileInput.click()">Select</button>
-          </div>
-        </div> -->
         <form [formGroup]="addTraineeForm" (ngSubmit)="onSubmit()">
           <div class="input-group">
             <div class="img">
@@ -309,7 +267,6 @@
                   formControlName="gender"
                 />
                 <label>Male</label>&nbsp;
-                <!-- <label for="male">Male</label> -->
                 <input
                   id="female"
                   class="gen"
@@ -322,34 +279,36 @@
               </div>
             </div>
           </div>
-          <!-- <div class="input-group"><br>
-            <div class="row full-width">
-              <div
-                class="input-group-label align-items-center d-flex col-10 col-sm-2 offset-sm-1"
-              >
-                Gender:
+
+          <div class="input-group" [style.visibility]="(selectedTraineeId ? 'visible' : 'hidden')" >
+              <div class="row full-width">
+                <div
+                  class="input-group-label align-items-center d-flex col-12 col-sm-2 offset-sm-1"
+                >
+                  Status:
+                </div>
+                <div class="col-12 col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control full-width"
+                    formControlName="status"           
+                  />
+                </div>
+                <div class="row mb-3">
+                  <div
+                    class="col-12 offset-sm-1 col-sm-11 error-msg"
+                    *ngIf="
+                      submitted &&
+                      (addTraineeForm?.controls?.status?.errors
+                        ?.required)
+                    "
+                  >
+                    Enter the status.
+                  </div>
+                </div>
               </div>
-              <div class="col-8 col-sm-2">  
-                <br><input
-                  type="radio"
-                  class="form-control"
-                  formControlName="gender"
-                  value="Male" 
-                />
-                <label for="male">Male</label>
-              </div>
-              <div class="col-10 col-sm-2">               
-                <br><input
-                  type="radio"
-                  class="form-control"
-                  formControlName="gender"
-                  value="Female"
-                />
-                <label for="male">Female</label>
-              </div>
-            </div>
-          </div>  -->
-          <div class="row">
+          </div>
+          <div class="row" style="margin-top: 5px;">
             <div class="col-12">
               <button
                 type="submit"
@@ -362,16 +321,6 @@
           </div>
         </form>
       </div>
-      <!-- <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="closeTraineeModal()"
-        >
-          Close
-        </button>
-        <button type="button" class="btn btn-primary">Save</button>
-      </div> -->
     </div>
   </div>
 </div>

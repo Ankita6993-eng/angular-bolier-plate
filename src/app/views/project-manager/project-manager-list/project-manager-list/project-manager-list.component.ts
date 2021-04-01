@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { ModalDirective } from "ngx-bootstrap/modal";
 import { BehaviorSubject, ReplaySubject } from "rxjs";
-import { debounce, last, take, takeUntil } from "rxjs/operators";
+import { takeUntil } from "rxjs/operators";
 import {
   EmployeesService,
   ResponseData,
@@ -62,13 +62,11 @@ export class ProjectManagerListComponent implements OnInit {
   ngOnInit(): void {
     const list = this.route.snapshot.data.list;
     this.projectManager$.next(list.data);
-    //this.projectData.push(list.data);
+    this.projectData = list.data;
     console.log("Project Data",this.projectData);
     
     this.currentPage = list.currentPage;
-    console.log("Current Page", this.currentPage);
     this.totalPages = list.totalPages;
-    console.log("Total Page", this.totalPages);
     for (let i = 0; i <= this.totalPages; i++) {
       if (i < 3) {
         this.paginationControl.push(i + 1);
@@ -76,25 +74,102 @@ export class ProjectManagerListComponent implements OnInit {
     }
   }
 
-  // getProjectManagerList1(page?:any){
-  //   const data = {
-  //     role: this.role,
-  //   };
-  //   try{
-  //     this.employeeService.getEmployees(data,page).subscribe((res:any)=>{
-  //       const {statusCode,data,message} = res;
-  //         if(statusCode == 200){
-  //           this.projectData.push(data);
-            
-  //         }else{
-  //           this.toaster.error("Cannot load");
-  //         }
-  //     });
+  //Get list using array.
+  getProjectManagerList1(page?:any){
+    this.ngxLoader.start();
+    const data = {
+      role: this.role,
+    };
+    try{
+      this.employeeService.getEmployees(data,page).subscribe((res:any)=>{
+        const {statusCode,data,message} = res;
+          if(statusCode == 200){
+            this.projectData = data;
+            this.ngxLoader.stop();
+          }else{
+            this.toaster.error("Cannot load");
+            this.ngxLoader.stop();
+          }
+      });
       
-  //   }catch(error){
-  //     console.log(error);
-  //   }
-  // }
+    }catch(error){
+      console.log(error);
+      this.ngxLoader.stop();
+    }
+  }
+  
+  //Adding using array:
+  addProjManag1(){
+    this.ngxLoader.start();
+    const formdata = new FormData();
+    const projmanagdata = this.addProjectManagerForm.value;
+    projmanagdata.role = this.role;
+    projmanagdata.dob = projmanagdata.dob.split("-").join("/");
+    delete projmanagdata["status"];
+    Object.keys(projmanagdata).forEach((key) => {
+      if (key != "image") {
+        formdata.append(key, projmanagdata[key]);
+      }
+    });
+    if (this.image) {
+      formdata.append("image", this.image);
+    }
+    this.image = null;
+    try{
+      this.employeeService.addEmployee(formdata).subscribe((res:ResponseData)=>{
+        const {statusCode,data} = res;
+        if(statusCode == 200){
+          let arrayD = this.projectData;
+          arrayD.unshift(data); 
+          this.toaster.success("Added Successfully");
+          arrayD.pop();
+          this.getProjectManagerList();
+          this.ngxLoader.stop();
+        }
+        else{
+          this.ngxLoader.stop();
+        }
+      });
+    }catch{
+      this.toaster.error("Error Adding Value");
+      this.ngxLoader.stop();
+    }
+  }
+
+  //Update using array:
+  updProjManag1(){
+    this.ngxLoader.start();
+    const formdata = new FormData();
+    let updprojData = this.addProjectManagerForm.value;
+    updprojData.role = this.role;
+    updprojData.dob = updprojData.dob;
+    Object.keys(updprojData).forEach((key)=>{
+      if(key!='image'){formdata.append(key,updprojData[key])}
+    });
+    if(this.image){formdata.append("image",this.image)}
+    this.image = null;
+    try{
+      this.employeeService.updateEmployee(formdata,this.selectedProjectManagerData).subscribe((res:ResponseData)=>{
+        const{statusCode,data} = res;
+        if(statusCode == 200){
+          let projectmanagClone = this.projectData;
+          let findManager = projectmanagClone.find((item)=>item._id == data._id);
+          let index = projectmanagClone.indexOf(findManager);
+          if(index > -1){
+            this.projectData.splice(index,1,data);
+          }
+          this.ngxLoader.stop();
+        }
+        else{
+          this.toaster.error("Cannot Update:");
+          this.ngxLoader.stop();
+        }
+      })
+    }catch(error){
+      this.toaster.error(error);
+      this.ngxLoader.stop();
+    }
+  }
 
   getProjectManagerList(page?: any) {
     this.ngxLoader.start();
@@ -117,42 +192,9 @@ export class ProjectManagerListComponent implements OnInit {
           }
         });
     } catch (error) {
-      console.log(error);
       this.ngxLoader.stop();
     }
   }
-
-  // addProjManag1(){
-  //   const formdata = new FormData();
-  //   const projmanagdata = this.addProjectManagerForm.value;
-  //   projmanagdata.role = this.role;
-  //   projmanagdata.dob = projmanagdata.dob.split("-").join("/");
-  //   delete projmanagdata["status"];
-  //   Object.keys(projmanagdata).forEach((key) => {
-  //     if (key != "image") {
-  //       formdata.append(key, projmanagdata[key]);
-  //     }
-  //   });
-  //   if (this.image) {
-  //     formdata.append("image", this.image);
-  //   }
-  //   try{
-  //     this.employeeService.addEmployee(formdata).subscribe((res:ResponseData)=>{
-  //       const {statusCode,data} = res;
-  //       if(statusCode == 200){
-  //         let arrayD = this.projectData;
-  //         console.log(arrayD);
-  //         arrayD.unshift(data);
-  //         arrayD.pop();
-  //         this.getProjectManagerList();
-  //       }
-  //       else{
-  //         console.log("error");
-          
-  //       }
-  //     });
-  //   }catch{}
-  // }
   
   addProjectManager() {
     this.ngxLoader.start();
@@ -205,10 +247,10 @@ export class ProjectManagerListComponent implements OnInit {
       status: data.status,
       gender: data.gender,
     });
-    
     this.imagesUrl = data.profile_pic;
     this.isEdit = true;
     this.selectedProjectManagerData = data._id;
+    
   }
 
   updateProjectManager() {
@@ -225,7 +267,7 @@ export class ProjectManagerListComponent implements OnInit {
     if (this.image) {
       formdata.append("image", this.image);
     }
-    console.log("Project manager data:", projectManagerData);
+    this.image = null;
     try {
       this.employeeService
         .updateEmployee(formdata, this.selectedProjectManagerData)
@@ -236,13 +278,10 @@ export class ProjectManagerListComponent implements OnInit {
             let projManagerDataValue = this.asyncPipe.transform(
               this.projectManager$
             );
-            console.log(projManagerDataValue);
             let updatedProjManager = projManagerDataValue.find(
               (item) => item._id === data._id
             );
-            console.log("updated proj value:", updatedProjManager);
             let index = projManagerDataValue.indexOf(updatedProjManager);
-            console.log("index:", index);
             if (index > -1) {
               projManagerDataValue[index] = data;
               this.projectManager$.next(projManagerDataValue);
@@ -260,11 +299,11 @@ export class ProjectManagerListComponent implements OnInit {
       this.ngxLoader.stop();
     }
   }
+  
   uploadFile(event) {
     let freader = new FileReader();
     if (event.target.files && event.target.files[0]) {
       this.image = event.target.files[0];
-      console.log(this.image);
       freader.readAsDataURL(this.image);
       freader.onload = (): any => {
         this.imagesUrl = freader.result;
@@ -275,35 +314,16 @@ export class ProjectManagerListComponent implements OnInit {
     }
   }
   onPageChange(page) {
-    console.log("", page);
-    page > this.currentPage ? this.onNext(page) : this.onPrev();
-    // if(page == this.currentPage){
-    //   this.currentPage = page;
-    // }
-    // if(page > this.currentPage){
-    //   if (this.paginationControl[this.paginationControl.length - 1] !=this.totalPages) {       
-    //     this.paginationControl.push(this.paginationControl[this.paginationControl.length - 1] + 1);
-    //     this.paginationControl.shift();
-    //   }
-    // }
-    // else{
-    // //if(page < this.currentPage){
-    //   if (this.paginationControl[0] != 1) {
-    //     this.paginationControl.unshift([this.paginationControl[0] - 1]);
-    //     this.paginationControl.pop();
-    //   }
-    // }
     this.currentPage = page;
-    this.getProjectManagerList(this.currentPage);
+    this.getProjectManagerList1(this.currentPage);
   }
-  onNext(page) {
+  onNext() {
     if (this.paginationControl[this.paginationControl.length - 1] != this.totalPages) {
         this.paginationControl.push(this.paginationControl[this.paginationControl.length - 1] + 1);
         this.paginationControl.shift();    
     }
     this.currentPage += 1;
-    this.getProjectManagerList(this.currentPage);
-    console.log(this.currentPage);
+    this.getProjectManagerList1(this.currentPage);
   }
   onPrev() {
     if (this.paginationControl[0] != 1) {
@@ -311,15 +331,19 @@ export class ProjectManagerListComponent implements OnInit {
       this.paginationControl.pop();
     }
     this.currentPage -= 1;
-    this.getProjectManagerList(this.currentPage);
+    this.getProjectManagerList1(this.currentPage);
   }
-
+  onLast(page){
+    page=this.totalPages;
+    this.currentPage = page;
+    this.getProjectManagerList1(this.currentPage);
+  }
   onSubmit() {
     this.submitted = true;
     if (this.addProjectManagerForm.invalid) {
       return false;
     }
-    this.isEdit ? this.updateProjectManager() : this.addProjectManager();
+    this.isEdit ? this.updProjManag1() : this.addProjManag1();
     this.closeProjectManagerModal();
   }
 

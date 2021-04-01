@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 import { AuthService } from "../../services/auth.service";
-
 @Component({
   selector: "app-dashboard",
   templateUrl: "register.component.html",
@@ -36,7 +35,7 @@ export class RegisterComponent {
         role: ["", [Validators.required]],
         dob: ["", [Validators.required]],
         password: ["", [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ["", [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ["", [Validators.required]],
         gender: [""],
       },
       {

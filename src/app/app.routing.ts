@@ -50,6 +50,11 @@ export const routes: Routes = [
         path: 'trainees',
         canActivate: [AuthGuard],
         loadChildren: () => import('./views/trainees/trainees.module').then(m=>m.TraineesModule)
+      },
+      {
+        path: 'projectManager',
+        canActivate: [AuthGuard],
+        loadChildren: () => import('./views/project-manager/project-manager.module').then(m=>m.ProjectManagerModule)
       }
     ]
   }, 
