@@ -14,7 +14,7 @@ export class RequestInterceptor implements HttpInterceptor {
     const headersObj: any = {
       Accept: 'application/json'
     };
-
+    
     let url = environment.apiUrl + req.url;
 
       const accessToken = StorageService.getData('token');
