@@ -1,4 +1,4 @@
-.employees-table {
+.management-table {
     min-height: 60vh;
 }
 
@@ -21,20 +21,25 @@
     max-width: 205px;
     padding: auto;
     margin-right: -120px;
+    border: 9px
   }
   .imageUpload .img-edit {
     position: absolute;
     right: 19px;
     z-index: 1;
     top: 13px;
+    margin-right: -50px;
+    border: 9px solid rgb(105, 91, 91);
   }
   #upload 
   {
       margin-top: 250px;
-      margin-left: 50px;
+      margin-left: 90px;
+      border: 9px
   }
   .imageUpload input {
         display: none;
+        border: 9px
         
   }
   .imagePreview {
@@ -59,7 +64,7 @@
   {
     height: 50px;
     width: 60px;
-    border: none;
+    border: 9px;
   }
   #header
   {
@@ -70,6 +75,7 @@
     width: 250px;
     height: 200px;
     object-fit: cover;
+    
   }
   #list1
   {
@@ -79,37 +85,4 @@
     float: left;
     //overflow: hidden;
   }
-  .dropdown .dropbtn {
-    font-size: 16px;  
-    border: none;
-    outline: none;
-    color: rgb(14, 6, 6);
-    padding: 14px 16px;
-    background-color: inherit;
-    font-family: inherit;
-    margin: 0;
-  }  
-  .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #dfd5d5;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-  }
-  .dropdown-content a {
-    float: none;
-    color: rgb(7, 6, 6);
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    text-align: left;
-  }
   
-  .dropdown-content a:hover {
-    background-color: rgb(214, 207, 207);
-  }
-  
-  .dropdown:hover .dropdown-content {
-    display: block;
-  }

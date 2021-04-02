@@ -43,6 +43,11 @@ export const routes: Routes = [
         path: 'employees',
         canActivate: [AuthGuard],
         loadChildren: () => import('./views/employees/employees.module').then(m => m.CountriesModule)
+      },
+      {
+        path: 'management',
+        canActivate: [AuthGuard],
+        loadChildren: () => import('./views/mangement/managements/managements.module').then(m=>m.ManagementsModule)
       }
     ]
   }, 

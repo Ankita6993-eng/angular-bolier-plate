@@ -15,8 +15,8 @@ import { ModalDirective } from "ngx-bootstrap/modal";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ToastrService } from "ngx-toastr";
 import { AsyncPipe } from "@angular/common";
-import { NgxUiLoaderService, SPINNER } from "ngx-ui-loader";
-import { ActivatedRoute, Router } from "@angular/router";
+import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { ActivatedRoute } from "@angular/router";
 
 @Component({
   templateUrl: "employee-list.component.html",
@@ -38,7 +38,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
   arr1: Array<any> = [];
   selectedIndex: number = null;
   currentpage: number = 1;
-  spinnerType = SPINNER.circle;
+
   existing_user: any;
   tot_pages: number;
   imageUrl: any = " ";
@@ -46,6 +46,8 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
   role: string;
   role_value: Array<any> = [];
   selected: any;
+  submitted:boolean=false
+ 
 
   constructor(
     private EmployeesService: EmployeesService,
@@ -68,16 +70,18 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
           Validators.pattern(this.eml_pat),
         ],
       ],
+      status:[""],
       dob: ["", Validators.required],
-      // role: ["Employee"],
       gender: ["", Validators.required],
       image: [""],
     });
   }
 
   ngOnInit(): void {
+    this.ngxService.start()
     const list = this.route.snapshot.data.list;
     this.employees$.next(list.data);
+    this.ngxService.stop()
     this.tot_pages = list.totalPages;
     for (let i = 0; i < this.tot_pages; i++) {
       if (i < 3) {
@@ -107,28 +111,31 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     const data = {
       role: this.role,
     };
+    this.ngxService.start();
     try {
       this.EmployeesService.getUser(data, page)
         .pipe(takeUntil(this.destroyed$))
         .subscribe((result: any) => {
-          this.loading = false;
+          this.loading = true;
           const { statusCode, data, message } = result;
-          this.ngxService.start();
+         
           if (statusCode === 200) {
             this.employees$.next(data);
-            this.toasterService.success(message);
             this.ngxService.stop();
+            this.toasterService.success(message);
           } else {
-            this.toasterService.error(message);
+            this.toasterService.error("Recored successfully generated");
             this.ngxService.stop();
           }
         });
     } catch (err) {
       console.log("err", err);
+      this.ngxService.stop();
     }
   }
 
   onSubmit() {
+    this.submitted=true
     if (this.addEmployeeForm.invalid) {
       return;
     }
@@ -152,16 +159,20 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
   }
 
   addEmployee() {
+    let temp_data=this.addEmployeeForm.value    
+    delete temp_data["status"]
+    
+    try{
     let data = this.employee_model();
     this.ngxService.start();
-    const temp_emp = this.employees$.value;
+    let temp_emp = this.employees$.value;
     this.EmployeesService.addUser(data)
       .pipe(takeUntil(this.destroyed$))
       .subscribe((result: ResponseData) => {
         const { statusCode, message, data } = result;
         if (statusCode === 200) {
           temp_emp.unshift(data);
-          this.toasterService.success("User successfully created");
+          this.toasterService.success("Recored successfully created");
           temp_emp.pop();
           this.ngxService.stop();
           this.closeEmployeeModal();
@@ -170,9 +181,14 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
           this.ngxService.stop();
         }
       });
+    }catch(err){
+      console.log('err.message', err.message);
+      this.ngxService.stop();
+    }
   }
 
   openUpdaterecorde(employee: any) {
+    try{
     var date = employee.dob;
     var date1 = new Date(date);
 
@@ -181,6 +197,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
       last_name: employee.last_name,
       email: employee.email,
       dob: date1.toLocaleDateString("en-CA"),
+      status:employee.status,
       gender: employee.gender,
       role: this.role,
     });
@@ -188,9 +205,15 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     this.selectedEmployeeId = employee._id;
     this.employeeModal.show();
     this.isEdit = true;
+  }catch(err){
+    console.log('err.message', err.message);
+    
+  }
   }
 
+  
   updateEmployee() {
+    try{
     let data = this.employee_model();
     this.ngxService.start();
     this.EmployeesService.updateUser(data, this.selectedEmployeeId)
@@ -212,12 +235,16 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
           this.closeEmployeeModal();
           this.ngxService.stop();
           this.addEmployeeForm.reset();
-          this.toasterService.success(message);
+          this.toasterService.success("Recored Sucessfully updated");
         } else {
           this.toasterService.error(message);
           this.ngxService.stop();
         }
       });
+    }catch(err){
+      console.log('err.message', err.message);
+      this.ngxService.stop();
+    }
   }
 
   openConfirmationModal(id: string) {
@@ -231,11 +258,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroyed$))
         .subscribe((result: ResponseData) => {
           this.loading = false;
-          console.log("this.selectedEmployeeId", this.selectedEmployeeId);
           const { statusCode, message } = result;
-          console.log("result", result);
-          console.log("statusCode====>", statusCode);
-
           if (statusCode === 200) {
             let employeesClone = this.asyncPipe.transform(this.employees$);
             const deletedEmployee = employeesClone.find(
@@ -247,7 +270,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
               this.employees$.next(employeesClone);
             }
             this.closeConfirmationModal();
-            this.toasterService.success(message);
+            this.toasterService.success("Recored successfully deleted");
           } else {
           }
         });
@@ -258,14 +281,18 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
 
   clickPage(pagenationType: string, page: number) {
     switch (pagenationType) {
+     
       case "prev": {
         this.currentpage = this.currentpage - 1;
+       
         try {
+          this.getEmployeesList(this.currentpage);
+         
           if (this.arr1[0] != 1) {
             let first_ele = this.arr1[0];
             this.arr1.unshift(first_ele - 1);
             this.arr1.pop();
-            this.getEmployeesList(this.currentpage);
+           
           }
         } catch (err) {
           console.log("err", err);
@@ -274,7 +301,6 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
       }
       case "current": {
         this.currentpage = page;
-        const data = { role: "Employee" };
         try {
           this.getEmployeesList(page);
         } catch (err) {
@@ -285,12 +311,13 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
 
       case "next": {
         this.currentpage = this.currentpage + 1;
+      
         try {
+          this.getEmployeesList(this.currentpage);
           if (this.arr1[2] != this.tot_pages) {
             let last_ele = this.arr1[2];
             this.arr1.push(last_ele + 1);
             this.arr1.shift();
-            this.getEmployeesList(this.currentpage);
           }
         } catch (err) {
           console.log("err", err);
@@ -305,6 +332,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     this.employeeModal.hide();
     if (this.selectedEmployeeId) this.selectedEmployeeId = null;
     this.addEmployeeForm.reset();
+    this.submitted=false
     this.isEdit = false;
     this.imageUrl = " ";
   }

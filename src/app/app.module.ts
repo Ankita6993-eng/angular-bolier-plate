@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule,ErrorHandler,Injectable } from '@angular/core';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -8,13 +8,14 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { IconModule, IconSetModule, IconSetService } from '@coreui/icons-angular';
 
 import { AppComponent } from './app.component';
-
+import { HttpInterceptor, HttpEvent, HttpRequest, HttpHandler, HttpErrorResponse } from '@angular/common/http';
 // Import containers
 import { DefaultLayoutComponent } from './containers';
 
 import { P404Component } from './views/error/404.component';
 import { LoginComponent } from './views/login/login.component';
 import { RegisterComponent } from './views/register/register.component';
+//import {ErroeHandlingService} from './services/erroe-handling.service'
 
 const APP_CONTAINERS = [
   DefaultLayoutComponent
@@ -41,6 +42,15 @@ import { RequestInterceptor } from './http/http.interceptors';
 import { ToastrModule, ToastrService } from 'ngx-toastr';
 import { BaseComponent } from './containers/base/base.component';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { NgxUiLoaderModule, SPINNER,POSITION,NgxUiLoaderConfig } from  'ngx-ui-loader';
+
+ const ngloader:NgxUiLoaderConfig={
+  fgsType: SPINNER.cubeGrid,
+  hasProgressBar: false,
+  fgsSize:200,
+  fgsPosition:'center-center'
+ }
+
 
 @NgModule({
   imports: [
@@ -61,7 +71,8 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
     FormsModule,
     HttpClientModule,
     BsDatepickerModule.forRoot(),
-    ToastrModule.forRoot()
+    ToastrModule.forRoot(),
+    NgxUiLoaderModule.forRoot(ngloader)
   ],
   declarations: [
     AppComponent,
@@ -69,7 +80,9 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
     P404Component,
     LoginComponent,
     RegisterComponent,
-    BaseComponent
+    BaseComponent,
+  
+    
   ],
   providers: [
     {
@@ -81,6 +94,7 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
       useClass: RequestInterceptor, 
       multi: true
     },
+    
     IconSetService,
     AuthService,
     ToastrService
