@@ -16,6 +16,7 @@ export class UserResolverResolver implements Resolve<any> {
   
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
     let role = route.data.title;
-    return this.employeeservice.getEmployees({role});
+    return this.employeeservice.getEmployees({role}) 
+    ;
   }
 }
