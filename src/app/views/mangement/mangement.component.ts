@@ -116,7 +116,7 @@ export class MangementComponent implements OnInit, OnDestroy {
     this.ngxService.start();
     try {
       this.management_service
-        .getUser(data, page)
+        .getEmployees(data, page)
         .pipe(takeUntil(this.destroyed$))
         .subscribe((result: any) => {
           const { statusCode, message, data } = result;
@@ -171,7 +171,7 @@ export class MangementComponent implements OnInit, OnDestroy {
       this.ngxService.start();
       let data = this.management_modal();
       this.management_service
-        .addUser(data)
+        .addEmployee(data)
         .pipe(takeUntil(this.destroyed$))
         .subscribe((result: any) => {
           const { statusCode, message, data } = result;
@@ -249,7 +249,7 @@ export class MangementComponent implements OnInit, OnDestroy {
       let data = this.management_modal();
       this.ngxService.start();
       this.management_service
-        .updateUser(data, this.select_management_id)
+        .updateEmployee(data, this.select_management_id)
         .pipe(takeUntil(this.destroyed$))
         .subscribe((result: ResponseData) => {
           const { statusCode, message, data } = result;

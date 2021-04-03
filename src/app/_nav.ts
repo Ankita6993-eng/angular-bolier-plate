@@ -6,8 +6,12 @@ export const navItems: INavData[] = [
     url: '/employees',
     icon: 'cil-menu'
   },
- 
-    {
+  {
+    name: 'Management',
+    url: '/management',
+    icon: 'cil-note-add'
+  },
+  {
     name: 'Trainees',
     url: '/trainees',
     icon: 'cil-menu'

@@ -113,7 +113,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     };
     this.ngxService.start();
     try {
-      this.EmployeesService.getUser(data, page)
+      this.EmployeesService.getEmployees(data, page)
         .pipe(takeUntil(this.destroyed$))
         .subscribe((result: any) => {
           this.loading = true;
@@ -166,7 +166,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     let data = this.employee_model();
     this.ngxService.start();
     let temp_emp = this.employees$.value;
-    this.EmployeesService.addUser(data)
+    this.EmployeesService.addEmployee(data)
       .pipe(takeUntil(this.destroyed$))
       .subscribe((result: ResponseData) => {
         const { statusCode, message, data } = result;
@@ -216,7 +216,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     try{
     let data = this.employee_model();
     this.ngxService.start();
-    this.EmployeesService.updateUser(data, this.selectedEmployeeId)
+    this.EmployeesService.updateEmployee(data, this.selectedEmployeeId)
       .pipe(takeUntil(this.destroyed$))
       .subscribe((result: ResponseData) => {
         const { statusCode, message, data } = result;
@@ -254,7 +254,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
 
   deleteEmployee() {
     try {
-      this.EmployeesService.deleteUser(this.selectedEmployeeId)
+      this.EmployeesService.deleteEmployee(this.selectedEmployeeId)
         .pipe(takeUntil(this.destroyed$))
         .subscribe((result: ResponseData) => {
           this.loading = false;
