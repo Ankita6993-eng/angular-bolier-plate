@@ -6,9 +6,15 @@ export const navItems: INavData[] = [
     url: '/employees',
     icon: 'cil-menu'
   },
+ 
+    {
+    name: 'Trainees',
+    url: '/trainees',
+    icon: 'cil-menu'
+  },
   {
-    name: 'AddEmployees',
-    url: '/employees/AddEmployee',
-    icon: 'cil-note-add'
+    name: 'Project Manager',
+    url: '/projectManager',
+    icon: 'cil-menu'
   }
 ];

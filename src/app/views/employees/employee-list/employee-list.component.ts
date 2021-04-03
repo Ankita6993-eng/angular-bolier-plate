@@ -279,7 +279,7 @@ export class EmployeeListComponent implements OnInit, OnDestroy {
     }
   }
 
-  clickPage(pagenationType: string, page: number) {
+  clickPage(pagenationType: string, page?: number) {
     switch (pagenationType) {
      
       case "prev": {

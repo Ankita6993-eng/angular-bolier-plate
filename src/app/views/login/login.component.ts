@@ -4,7 +4,6 @@ import { AuthService } from '../../services/auth.service';
 import { StorageService } from '../../services/storage.service';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
-
 @Component({
   selector: 'app-dashboard',
   templateUrl: 'login.component.html'
@@ -31,6 +30,7 @@ export class LoginComponent {
         if (res.statusCode === 200) {
           StorageService.setData('token', res.data.token);
           StorageService.setData('adminId', res.data._id);
+          StorageService.setData('role',res.data.role);
           setTimeout(() => {
             this.toaster.success('Welcome Admin!');
             this.router.navigate(['/employees'])

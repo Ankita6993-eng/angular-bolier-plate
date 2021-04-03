@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { from } from 'rxjs';
+import { EmployeeResolverResolver } from '../../services/employee-resolver.resolver';
 import { EmployeeListComponent } from './employee-list/employee-list.component';
 import {AddEmployeeComponent} from './add-employee/add-employee.component'
 import { UserResolverResolver } from '../../services/user-resolver.resolver';
